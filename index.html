@@ -1,245 +1,147 @@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="ÉcoLab — an interactive laboratory for learning microeconomics, mesoeconomics and macroeconomics.">
-  <title>ÉcoLab — The Economics Laboratory</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+/* =========================================
+   ÉCOBOT — FRONT-END CHAT PROTOTYPE
+========================================= */
 
-<header class="navbar">
-  <a href="#home" class="logo"><span>É</span>CO<span class="logo-light">LAB</span></a>
-  <nav>
-    <a href="#laboratories">Laboratories</a>
-    <a href="#simulator">Simulator</a>
-    <a href="#calculators">Calculators</a>
-    <a href="#about">About</a>
-  </nav>
-  <a href="#laboratories" class="nav-button">Explore the lab ↗</a>
-</header>
+document.addEventListener("DOMContentLoaded", () => {
 
-<main>
-<section class="hero" id="home">
-  <div class="hero-content">
-    <div class="eyebrow"><span class="pulse"></span> THE INTERACTIVE ECONOMICS LABORATORY</div>
-    <h1>Understand the economy.<br><em>Change the variables.</em></h1>
-    <p>Explore the mechanisms behind economic decisions, industries and entire economies through interactive experiments, simulations and practical tools.</p>
-    <div class="hero-actions">
-      <a href="#laboratories" class="primary-button">Enter the laboratories ↗</a>
-      <a href="#simulator" class="secondary-button">Try an experiment ↓</a>
-    </div>
-    <div class="hero-note">MICROECONOMICS <span>·</span> MESOECONOMICS <span>·</span> MACROECONOMICS</div>
-  </div>
-  <div class="hero-graphic">
-    <div class="orbit orbit-one"></div>
-    <div class="orbit orbit-two"></div>
-    <div class="hero-core">
-      <span class="core-label">ECONOMIC SYSTEMS</span>
-      <strong>Σ</strong>
-      <span>Decisions create<br>connections.</span>
-    </div>
-    <div class="orbit-tag tag-one">μ &nbsp; MICRO</div>
-    <div class="orbit-tag tag-two">↔ &nbsp; MESO</div>
-    <div class="orbit-tag tag-three">Σ &nbsp; MACRO</div>
-  </div>
-  <div class="hero-bottom"><span>01 / THREE LEVELS OF ANALYSIS</span><span>SCROLL TO DISCOVER ↓</span></div>
-</section>
+    const launcher = document.getElementById("ecobotLauncher");
+    const windowElement = document.getElementById("ecobotWindow");
+    const closeButton = document.getElementById("ecobotClose");
+    const form = document.getElementById("ecobotForm");
+    const input = document.getElementById("ecobotInput");
+    const messages = document.getElementById("ecobotMessages");
+    const suggestions = document.querySelectorAll(".suggestion-chip");
 
-<section class="section" id="laboratories">
-  <div class="section-heading">
-    <div><span class="eyebrow">THE THREE LABORATORIES</span><h2>One economy.<br><em>Three perspectives.</em></h2></div>
-    <p>Move between individual decisions, industrial structures and national economic outcomes. Discover how each level influences the others.</p>
-  </div>
+    if (!launcher || !windowElement) return;
 
-  <div class="lab-grid">
-    <article class="lab-card micro">
-      <div class="card-top"><span>01</span><small>THE INDIVIDUAL</small></div>
-      <div class="lab-symbol">μ</div>
-      <h3>Microeconomics</h3>
-      <p>Understand how consumers and firms make decisions, allocate resources and interact in markets.</p>
-      <div class="topics">
-        <span>Supply & demand</span><span>Elasticity</span>
-        <span>Consumer theory</span><span>Production</span>
-        <span>Costs & revenue</span><span>Market structures</span>
-        <span>Opportunity cost</span><span>Marginal analysis</span>
-      </div>
-      <a href="#micro-topics">Explore microeconomics ↗</a>
-    </article>
+    function openChat() {
+        windowElement.hidden = false;
+        launcher.setAttribute("aria-expanded", "true");
+        input.focus();
+    }
 
-    <article class="lab-card meso">
-      <div class="card-top"><span>02</span><small>THE CONNECTIONS</small></div>
-      <div class="lab-symbol">↔</div>
-      <h3>Mesoeconomics</h3>
-      <p>Explore the structures connecting firms, industries, sectors, markets and regional economies.</p>
-      <div class="topics">
-        <span>Value chains</span><span>Industrial clusters</span>
-        <span>Sector productivity</span><span>Market concentration</span>
-        <span>Regional development</span><span>Supply chains</span>
-        <span>Industrial organization</span><span>Value added</span>
-      </div>
-      <a href="#meso-topics">Explore mesoeconomics ↗</a>
-    </article>
+    function closeChat() {
+        windowElement.hidden = true;
+        launcher.setAttribute("aria-expanded", "false");
+        launcher.focus();
+    }
 
-    <article class="lab-card macro">
-      <div class="card-top"><span>03</span><small>THE BIG PICTURE</small></div>
-      <div class="lab-symbol">Σ</div>
-      <h3>Macroeconomics</h3>
-      <p>Understand national production, inflation, employment, economic growth and public policy.</p>
-      <div class="topics">
-        <span>GDP & GNI</span><span>Inflation</span>
-        <span>Unemployment</span><span>Economic growth</span>
-        <span>National income</span><span>Investment & savings</span>
-        <span>Monetary policy</span><span>International trade</span>
-      </div>
-      <a href="#macro-topics">Explore macroeconomics ↗</a>
-    </article>
-  </div>
-</section>
+    launcher.addEventListener("click", () => {
+        if (windowElement.hidden) openChat();
+        else closeChat();
+    });
 
-<section class="experiment-section" id="simulator">
-  <div class="section-heading">
-    <div><span class="eyebrow">LIVE EXPERIMENT / 001</span><h2>Markets respond.<br><em>See it happen.</em></h2></div>
-    <p>Adjust market demand and supply. Watch the equilibrium price and quantity update in real time.</p>
-  </div>
+    closeButton.addEventListener("click", closeChat);
 
-  <div class="simulator">
-    <div class="sim-controls">
-      <div class="panel-heading">MARKET PARAMETERS <span class="live">● LIVE MODEL</span></div>
 
-      <label>Demand intensity <strong id="demandValue">70</strong></label>
-      <input type="range" id="demand" min="20" max="120" value="70">
-      <p>Higher demand shifts the demand curve outward.</p>
+    function addMessage(text, sender) {
+        const message = document.createElement("div");
 
-      <label>Supply capacity <strong id="supplyValue">30</strong></label>
-      <input type="range" id="supply" min="10" max="90" value="30">
-      <p>Higher supply shifts the supply curve outward.</p>
+        message.className =
+            sender === "user" ? "user-message" : "bot-message";
 
-      <label>Per-unit tax <strong id="taxValue">0</strong></label>
-      <input type="range" id="tax" min="0" max="30" value="0">
-      <p>Observe the impact of a tax on the market.</p>
+        if (sender === "bot") {
+            const label = document.createElement("span");
+            label.className = "message-label";
+            label.textContent = "ÉCOBOT";
+            message.appendChild(label);
+        }
 
-      <button id="resetMarket" class="reset-button">↺ Reset experiment</button>
-    </div>
+        const paragraph = document.createElement("p");
+        paragraph.textContent = text;
 
-    <div class="sim-results">
-      <div class="chart-heading"><span>MARKET EQUILIBRIUM</span><small>ILLUSTRATIVE MODEL</small></div>
-      <canvas id="marketChart"></canvas>
-      <div class="metrics">
-        <div><small>EQUILIBRIUM PRICE</small><strong id="eqPrice">—</strong></div>
-        <div><small>EQUILIBRIUM QUANTITY</small><strong id="eqQty">—</strong></div>
-        <div><small>TAX WEDGE</small><strong id="taxWedge">—</strong></div>
-      </div>
-      <p id="marketInsight" class="insight">Change a parameter to explore the market.</p>
-    </div>
-  </div>
-</section>
+        message.appendChild(paragraph);
+        messages.appendChild(message);
 
-<section class="section" id="calculators">
-  <div class="section-heading">
-    <div><span class="eyebrow">THE ECONOMIST'S TOOLKIT</span><h2>From theory<br><em>to calculation.</em></h2></div>
-    <p>Use real numbers, apply economic formulas and understand the results.</p>
-  </div>
+        messages.scrollTop = messages.scrollHeight;
+    }
 
-  <div class="calculator-grid">
-    <article class="calculator">
-      <span class="tool-category">MICROECONOMICS / 001</span>
-      <div class="tool-icon">%</div>
-      <h3>Price Elasticity of Demand</h3>
-      <p>Measure the responsiveness of quantity demanded to a change in price.</p>
-      <div class="input-grid">
-        <label>Initial price<input id="p1" type="number" value="10"></label>
-        <label>New price<input id="p2" type="number" value="12"></label>
-        <label>Initial quantity<input id="q1" type="number" value="100"></label>
-        <label>New quantity<input id="q2" type="number" value="85"></label>
-      </div>
-      <button class="calculate-button" id="elasticityBtn">Calculate ↗</button>
-      <div class="result"><span>Midpoint elasticity</span><strong id="elasticityResult">—</strong></div>
-      <p class="explanation" id="elasticityExplain">Your result will appear here.</p>
-    </article>
 
-    <article class="calculator">
-      <span class="tool-category">MACROECONOMICS / 001</span>
-      <div class="tool-icon">Σ</div>
-      <h3>GDP Calculator</h3>
-      <p>Calculate GDP using the expenditure approach.</p>
-      <div class="input-grid">
-        <label>Consumption (C)<input id="gC" type="number" value="500"></label>
-        <label>Investment (I)<input id="gI" type="number" value="150"></label>
-        <label>Government (G)<input id="gG" type="number" value="200"></label>
-        <label>Exports (X)<input id="gX" type="number" value="120"></label>
-        <label>Imports (M)<input id="gM" type="number" value="90"></label>
-      </div>
-      <button class="calculate-button" id="gdpBtn">Calculate ↗</button>
-      <div class="result"><span>Gross Domestic Product</span><strong id="gdpResult">—</strong></div>
-      <p class="explanation" id="gdpExplain">GDP = C + I + G + (X − M)</p>
-    </article>
+    // Educational prototype knowledge base.
+    // This is not a generative AI model.
 
-    <article class="calculator">
-      <span class="tool-category">MESOECONOMICS / 001</span>
-      <div class="tool-icon">↔</div>
-      <h3>Market Concentration</h3>
-      <p>Calculate the Herfindahl–Hirschman Index (HHI).</p>
-      <label class="full-input">Market shares (%)<input id="shares" type="text" value="40, 30, 20, 10" placeholder="40, 30, 20, 10"></label>
-      <button class="calculate-button" id="hhiBtn">Calculate ↗</button>
-      <div class="result"><span>HHI Index</span><strong id="hhiResult">—</strong></div>
-      <p class="explanation" id="hhiExplain">Enter market shares adding up to 100%.</p>
-    </article>
+    function getEconomicsAnswer(question) {
 
-    <article class="calculator">
-      <span class="tool-category">STATISTICS / 001</span>
-      <div class="tool-icon">x̄</div>
-      <h3>Descriptive Statistics</h3>
-      <p>Calculate the mean, median and range of a dataset.</p>
-      <label class="full-input">Dataset<input id="dataset" type="text" value="12, 15, 18, 18, 21, 24, 30"></label>
-      <button class="calculate-button" id="statsBtn">Analyse ↗</button>
-      <div class="stat-results">
-        <div><small>MEAN</small><strong id="meanResult">—</strong></div>
-        <div><small>MEDIAN</small><strong id="medianResult">—</strong></div>
-        <div><small>RANGE</small><strong id="rangeResult">—</strong></div>
-      </div>
-      <p class="explanation" id="statsExplain">Enter a numerical dataset.</p>
-    </article>
-  </div>
-</section>
+        const q = question.toLowerCase();
 
-<section class="bridge-section" id="about">
-  <div>
-    <span class="eyebrow">THE BIG IDEA</span>
-    <h2>Zoom in.<br>Zoom out.<br><em>Connect the dots.</em></h2>
-    <p>Economic phenomena rarely happen in isolation. A decision by one firm can affect an entire industry and eventually influence national economic indicators.</p>
-  </div>
-  <div class="bridge-flow">
-    <div class="bridge-node"><small>MICROECONOMICS</small><strong>A firm increases wages</strong><span>Household income changes.</span></div>
-    <div class="connector">↓</div>
-    <div class="bridge-node"><small>MESOECONOMICS</small><strong>Sector costs change</strong><span>Suppliers and competitors react.</span></div>
-    <div class="connector">↓</div>
-    <div class="bridge-node"><small>MACROECONOMICS</small><strong>National indicators move</strong><span>Employment, prices and output.</span></div>
-  </div>
-</section>
+        if (q.includes("opportunity cost")) {
+            return "Opportunity cost is the value of the next-best alternative you give up when making a choice. For example, if you spend two hours studying instead of working, the opportunity cost may include the income you could have earned during those hours.";
+        }
 
-<section class="section topics-section">
-  <span class="eyebrow">EXPLORE THE KNOWLEDGE BASE</span>
-  <h2>Three lenses.<br><em>Endless questions.</em></h2>
-  <div class="topic-grid">
-    <article id="micro-topics"><span>01 / MICRO</span><h3>Individual decisions</h3><p>How do consumers maximize utility? How do firms determine output? Why do prices change?</p></article>
-    <article id="meso-topics"><span>02 / MESO</span><h3>Industrial structures</h3><p>Why do industries cluster? How does concentration affect competition? Where is value created?</p></article>
-    <article id="macro-topics"><span>03 / MACRO</span><h3>National outcomes</h3><p>How is GDP measured? What causes inflation? How do governments influence economic activity?</p></article>
-  </div>
-  <p class="disclaimer">Educational platform. Simulations use simplified assumptions and illustrative values. Always refer to your course syllabus for assessed definitions and methods.</p>
-</section>
-</main>
+        if (q.includes("inflation")) {
+            return "Inflation is a sustained increase in the general price level of goods and services over time. It reduces the purchasing power of money. Economists commonly measure consumer price inflation using a consumer price index (CPI).";
+        }
 
-<footer>
-  <a href="#home" class="logo"><span>É</span>CO<span class="logo-light">LAB</span></a>
-  <span>AN INTERACTIVE ECONOMICS LABORATORY</span>
-  <a href="#home">BACK TO TOP ↑</a>
-</footer>
+        if (q.includes("supply") || q.includes("demand")) {
+            return "Demand represents the quantities consumers are willing and able to buy at different prices. Supply represents the quantities producers are willing and able to sell. Their interaction determines market equilibrium in the basic competitive-market model.";
+        }
+
+        if (q.includes("elasticity")) {
+            return "Price elasticity of demand measures how responsive quantity demanded is to a change in price. The basic formula is percentage change in quantity demanded divided by percentage change in price. A magnitude greater than 1 is generally described as elastic.";
+        }
+
+        if (q.includes("gdp") || q.includes("gross domestic product")) {
+            return "Gross Domestic Product (GDP) measures the market value of final goods and services produced within a country during a given period. The expenditure approach is GDP = C + I + G + (X - M), where C is consumption, I is investment, G is government spending, X is exports, and M is imports.";
+        }
+
+        if (q.includes("microeconomics")) {
+            return "Microeconomics studies the decisions of individual economic agents, including households and firms, and how they interact in markets. Key topics include consumer choice, production, costs, supply, demand, elasticity, and market structures.";
+        }
+
+        if (q.includes("mesoeconomics")) {
+            return "Mesoeconomics is used in ÉcoLab as an intermediate analytical perspective. It focuses on industries, sectors, regions, institutions, and value chains, connecting individual markets to the broader economy.";
+        }
+
+        if (q.includes("macroeconomics")) {
+            return "Macroeconomics studies the economy as a whole. It examines aggregate output, economic growth, inflation, unemployment, fiscal policy, monetary policy, and international economic relationships.";
+        }
+
+        if (q.includes("monopoly")) {
+            return "A monopoly is a market structure in which a single firm is the only supplier of a product or service with no close substitutes. Entry barriers and market power can allow the firm to influence prices.";
+        }
+
+        if (q.includes("mean") || q.includes("average")) {
+            return "The arithmetic mean is calculated by adding all observations and dividing by the number of observations. It is sensitive to extreme values, so it can be useful to compare it with the median.";
+        }
+
+        return "That's an interesting economics question! My current prototype knowledge base covers foundational concepts such as opportunity cost, supply and demand, elasticity, GDP, inflation, and the three main economic perspectives. A more advanced ÉcoBot will use an AI model to answer broader questions, work through exercises, and explain concepts step by step.";
+    }
+
+
+    function sendMessage(question) {
+
+        const cleanQuestion = question.trim();
+
+        if (!cleanQuestion) return;
+
+        addMessage(cleanQuestion, "user");
+
+        const answer = getEconomicsAnswer(cleanQuestion);
+
+        setTimeout(() => {
+            addMessage(answer, "bot");
+        }, 350);
+    }
+
+
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        sendMessage(input.value);
+        input.value = "";
+    });
+
+
+    suggestions.forEach(button => {
+        button.addEventListener("click", () => {
+            openChat();
+            sendMessage(button.dataset.question);
+        });
+    });
+
+});
+
 
 <script src="script.js"></script>
 </body>
