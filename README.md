@@ -1,4 +1,4 @@
-# ÉcoLab | The Interactive Economics Laboratory
+# EcoLab | The Interactive Economics Laboratory
 
 **Understand the economy. Change the variables.**
 
@@ -153,11 +153,3 @@ Potential future additions include:
 - Additional statistical tools.
 - Personalized learning paths.
 - Expanded exercise and quiz libraries.
-
-## 9. License
-
-This project is distributed under the MIT License. See the `LICENSE` file for details.
-
----
-
-**ÉcoLab — Economics is better understood when you experiment with it.**
