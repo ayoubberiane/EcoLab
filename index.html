@@ -1,148 +1,566 @@
 
-/* =========================================
-   ÉCOBOT — FRONT-END CHAT PROTOTYPE
-========================================= */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ÉcoLab is an interactive economics learning platform. Explore microeconomics, mesoeconomics, macroeconomics, simulations and calculators.">
+  <meta name="theme-color" content="#101b16">
+  <title>ÉcoLab — Understand the Economy</title>
 
-document.addEventListener("DOMContentLoaded", () => {
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    const launcher = document.getElementById("ecobotLauncher");
-    const windowElement = document.getElementById("ecobotWindow");
-    const closeButton = document.getElementById("ecobotClose");
-    const form = document.getElementById("ecobotForm");
-    const input = document.getElementById("ecobotInput");
-    const messages = document.getElementById("ecobotMessages");
-    const suggestions = document.querySelectorAll(".suggestion-chip");
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
 
-    if (!launcher || !windowElement) return;
+<body>
 
-    function openChat() {
-        windowElement.hidden = false;
-        launcher.setAttribute("aria-expanded", "true");
-        input.focus();
-    }
+  <!-- NAVIGATION -->
+  <header class="site-header">
+    <a class="brand" href="#home" aria-label="ÉcoLab home">
+      <span class="brand-mark">É</span>
+      <span>ÉcoLab<span class="brand-dot">.</span></span>
+    </a>
 
-    function closeChat() {
-        windowElement.hidden = true;
-        launcher.setAttribute("aria-expanded", "false");
-        launcher.focus();
-    }
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
 
-    launcher.addEventListener("click", () => {
-        if (windowElement.hidden) openChat();
-        else closeChat();
-    });
+    <nav class="main-nav" id="mainNav">
+      <a href="#laboratories">Laboratories</a>
+      <a href="#simulator">Simulator</a>
+      <a href="#calculators">Calculators</a>
+      <a href="#observatory">Observatory</a>
+      <a href="#about">About</a>
+      <a href="#laboratories" class="nav-cta">Start learning <span>↗</span></a>
+    </nav>
+  </header>
 
-    closeButton.addEventListener("click", closeChat);
+  <main>
 
+    <!-- HERO -->
+    <section class="hero section-wrap" id="home">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="live-dot"></span> AN INTERACTIVE ECONOMICS PLATFORM</div>
 
-    function addMessage(text, sender) {
-        const message = document.createElement("div");
+        <h1>Understand the economy.<br><span>Change the variables.</span></h1>
 
-        message.className =
-            sender === "user" ? "user-message" : "bot-message";
+        <p class="hero-description">
+          Economics is more than theories and equations.
+          Explore how markets work, experiment with economic models,
+          and turn abstract concepts into practical understanding.
+        </p>
 
-        if (sender === "bot") {
-            const label = document.createElement("span");
-            label.className = "message-label";
-            label.textContent = "ÉCOBOT";
-            message.appendChild(label);
-        }
+        <div class="hero-actions">
+          <a href="#laboratories" class="button button-primary">Explore the laboratories <span>↗</span></a>
+          <a href="#simulator" class="button button-secondary">Try the simulator <span>→</span></a>
+        </div>
 
-        const paragraph = document.createElement("p");
-        paragraph.textContent = text;
+        <div class="hero-note">
+          <span class="hero-note-line"></span>
+          LEARN · EXPERIMENT · UNDERSTAND
+        </div>
+      </div>
 
-        message.appendChild(paragraph);
-        messages.appendChild(message);
+      <div class="hero-visual">
+        <div class="visual-topline">
+          <span>ECONOMIC SYSTEMS / 001</span>
+          <span>LIVE MODEL</span>
+        </div>
 
-        messages.scrollTop = messages.scrollHeight;
-    }
+        <div class="visual-chart">
+          <div class="chart-label chart-label-y">PRICE</div>
+          <div class="chart-label chart-label-x">QUANTITY</div>
+          <svg viewBox="0 0 500 340" role="img" aria-label="Illustrative supply and demand curves">
+            <defs>
+              <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#314239" stroke-width="1"/>
+              </pattern>
+            </defs>
+            <rect x="30" y="15" width="445" height="285" fill="url(#gridPattern)"/>
+            <path d="M55 25 V300 H475" fill="none" stroke="#809083" stroke-width="1.5"/>
+            <path d="M75 65 L430 270" fill="none" stroke="#b9f36b" stroke-width="4" stroke-linecap="round"/>
+            <path d="M75 270 L430 65" fill="none" stroke="#8ca7c5" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="252" cy="168" r="7" fill="#b9f36b" stroke="#17251e" stroke-width="3"/>
+            <path d="M252 168 V300 M55 168 H252" stroke="#b9f36b" stroke-dasharray="5 5" opacity=".7"/>
+            <text x="385" y="287" fill="#b9f36b" font-size="12" font-family="DM Mono">SUPPLY</text>
+            <text x="380" y="52" fill="#a9c3df" font-size="12" font-family="DM Mono">DEMAND</text>
+            <text x="265" y="155" fill="#b9f36b" font-size="11" font-family="DM Mono">EQUILIBRIUM</text>
+          </svg>
+        </div>
 
+        <div class="visual-bottom">
+          <div><span class="metric-label">MODEL</span><strong>SUPPLY / DEMAND</strong></div>
+          <div><span class="metric-label">VARIABLES</span><strong>PRICE · QUANTITY</strong></div>
+          <div class="visual-status"><span class="live-dot"></span> INTERACTIVE</div>
+        </div>
+      </div>
+    </section>
 
-    // Educational prototype knowledge base.
-    // This is not a generative AI model.
+    <!-- INTRO STRIP -->
+    <section class="intro-strip">
+      <div class="section-wrap intro-inner">
+        <p>THREE LEVELS OF ECONOMIC ANALYSIS</p>
+        <div class="intro-levels">
+          <span>01 / MICRO</span>
+          <span>02 / MESO</span>
+          <span>03 / MACRO</span>
+        </div>
+      </div>
+    </section>
 
-    function getEconomicsAnswer(question) {
+    <!-- LABORATORIES -->
+    <section class="section section-wrap" id="laboratories">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow">01 — LEARNING ENVIRONMENTS</div>
+          <h2>Explore the <span>economy.</span></h2>
+        </div>
+        <p class="section-intro">
+          Zoom in, explore the structures in between, then zoom out
+          to understand the economy as a whole.
+        </p>
+      </div>
 
-        const q = question.toLowerCase();
+      <div class="lab-grid">
 
-        if (q.includes("opportunity cost")) {
-            return "Opportunity cost is the value of the next-best alternative you give up when making a choice. For example, if you spend two hours studying instead of working, the opportunity cost may include the income you could have earned during those hours.";
-        }
+        <article class="lab-card lab-micro">
+          <div class="lab-card-top">
+            <span class="lab-number">01</span>
+            <span class="lab-tag">INDIVIDUAL LEVEL</span>
+          </div>
+          <div class="lab-art art-micro">
+            <div class="micro-orbit orbit-one"></div>
+            <div class="micro-orbit orbit-two"></div>
+            <div class="micro-core">μ</div>
+            <span class="art-node node-a">P</span>
+            <span class="art-node node-b">Q</span>
+            <span class="art-node node-c">D</span>
+          </div>
+          <h3>Microeconomics</h3>
+          <p>Understand how individuals and firms make decisions, allocate resources and interact in markets.</p>
+          <div class="topic-tags">
+            <span>Supply & demand</span><span>Consumer choice</span><span>Elasticity</span>
+          </div>
+          <a href="#micro-topics" class="text-link">Explore microeconomics <span>↗</span></a>
+        </article>
 
-        if (q.includes("inflation")) {
-            return "Inflation is a sustained increase in the general price level of goods and services over time. It reduces the purchasing power of money. Economists commonly measure consumer price inflation using a consumer price index (CPI).";
-        }
+        <article class="lab-card lab-meso">
+          <div class="lab-card-top">
+            <span class="lab-number">02</span>
+            <span class="lab-tag">SECTORAL LEVEL</span>
+          </div>
+          <div class="lab-art art-meso">
+            <div class="network-line line-one"></div>
+            <div class="network-line line-two"></div>
+            <div class="network-line line-three"></div>
+            <span class="network-node n-one">A</span>
+            <span class="network-node n-two">B</span>
+            <span class="network-node n-three">C</span>
+            <span class="network-node n-four">D</span>
+            <span class="network-node n-five">E</span>
+          </div>
+          <h3>Mesoeconomics</h3>
+          <p>Discover how industries, value chains, regional economies and business ecosystems function.</p>
+          <div class="topic-tags">
+            <span>Value chains</span><span>Clusters</span><span>Productivity</span>
+          </div>
+          <a href="#meso-topics" class="text-link">Explore mesoeconomics <span>↗</span></a>
+        </article>
 
-        if (q.includes("supply") || q.includes("demand")) {
-            return "Demand represents the quantities consumers are willing and able to buy at different prices. Supply represents the quantities producers are willing and able to sell. Their interaction determines market equilibrium in the basic competitive-market model.";
-        }
+        <article class="lab-card lab-macro">
+          <div class="lab-card-top">
+            <span class="lab-number">03</span>
+            <span class="lab-tag">AGGREGATE LEVEL</span>
+          </div>
+          <div class="lab-art art-macro">
+            <div class="macro-bars">
+              <span style="height:35%"></span>
+              <span style="height:55%"></span>
+              <span style="height:43%"></span>
+              <span style="height:72%"></span>
+              <span style="height:62%"></span>
+              <span style="height:88%"></span>
+              <span style="height:100%"></span>
+            </div>
+            <div class="macro-trend"></div>
+          </div>
+          <h3>Macroeconomics</h3>
+          <p>Explore national income, economic growth, inflation, unemployment and public policy.</p>
+          <div class="topic-tags">
+            <span>GDP</span><span>Inflation</span><span>Fiscal policy</span>
+          </div>
+          <a href="#macro-topics" class="text-link">Explore macroeconomics <span>↗</span></a>
+        </article>
+      </div>
+    </section>
 
-        if (q.includes("elasticity")) {
-            return "Price elasticity of demand measures how responsive quantity demanded is to a change in price. The basic formula is percentage change in quantity demanded divided by percentage change in price. A magnitude greater than 1 is generally described as elastic.";
-        }
+    <!-- SIMULATOR -->
+    <section class="section simulator-section" id="simulator">
+      <div class="section-wrap">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">02 — EXPERIMENTAL ECONOMICS</div>
+            <h2>Play with the <span>market.</span></h2>
+          </div>
+          <p class="section-intro">
+            Change the conditions of a market and observe how
+            equilibrium responds.
+          </p>
+        </div>
 
-        if (q.includes("gdp") || q.includes("gross domestic product")) {
-            return "Gross Domestic Product (GDP) measures the market value of final goods and services produced within a country during a given period. The expenditure approach is GDP = C + I + G + (X - M), where C is consumption, I is investment, G is government spending, X is exports, and M is imports.";
-        }
+        <div class="simulator-layout">
+          <div class="sim-controls">
+            <div class="panel-heading">
+              <div><span class="panel-index">MODEL INPUTS</span><h3>Control the market</h3></div>
+              <button class="reset-button" id="resetMarket">↺ Reset</button>
+            </div>
 
-        if (q.includes("microeconomics")) {
-            return "Microeconomics studies the decisions of individual economic agents, including households and firms, and how they interact in markets. Key topics include consumer choice, production, costs, supply, demand, elasticity, and market structures.";
-        }
+            <div class="slider-control">
+              <div class="slider-title"><label for="demandSlider">Demand intensity</label><output id="demandValue">50</output></div>
+              <input type="range" id="demandSlider" min="10" max="90" value="50">
+              <div class="range-labels"><span>LOW</span><span>HIGH</span></div>
+            </div>
 
-        if (q.includes("mesoeconomics")) {
-            return "Mesoeconomics is used in ÉcoLab as an intermediate analytical perspective. It focuses on industries, sectors, regions, institutions, and value chains, connecting individual markets to the broader economy.";
-        }
+            <div class="slider-control">
+              <div class="slider-title"><label for="supplySlider">Supply intensity</label><output id="supplyValue">50</output></div>
+              <input type="range" id="supplySlider" min="10" max="90" value="50">
+              <div class="range-labels"><span>LOW</span><span>HIGH</span></div>
+            </div>
 
-        if (q.includes("macroeconomics")) {
-            return "Macroeconomics studies the economy as a whole. It examines aggregate output, economic growth, inflation, unemployment, fiscal policy, monetary policy, and international economic relationships.";
-        }
+            <div class="slider-control">
+              <div class="slider-title"><label for="taxSlider">Per-unit tax</label><output id="taxValue">0</output></div>
+              <input type="range" id="taxSlider" min="0" max="40" value="0">
+              <div class="range-labels"><span>NO TAX</span><span>HIGH TAX</span></div>
+            </div>
 
-        if (q.includes("monopoly")) {
-            return "A monopoly is a market structure in which a single firm is the only supplier of a product or service with no close substitutes. Entry barriers and market power can allow the firm to influence prices.";
-        }
+            <div class="model-explanation" id="marketExplanation" aria-live="polite">
+              <span class="explanation-icon">↗</span>
+              <p>Adjust the variables to explore how demand, supply and taxation influence market equilibrium.</p>
+            </div>
+          </div>
 
-        if (q.includes("mean") || q.includes("average")) {
-            return "The arithmetic mean is calculated by adding all observations and dividing by the number of observations. It is sensitive to extreme values, so it can be useful to compare it with the median.";
-        }
+          <div class="sim-chart-panel">
+            <div class="chart-panel-header">
+              <div><span class="panel-index">LIVE VISUALIZATION</span><h3>Market equilibrium</h3></div>
+              <span class="chart-live"><span class="live-dot"></span> LIVE MODEL</span>
+            </div>
 
-        return "That's an interesting economics question! My current prototype knowledge base covers foundational concepts such as opportunity cost, supply and demand, elasticity, GDP, inflation, and the three main economic perspectives. A more advanced ÉcoBot will use an AI model to answer broader questions, work through exercises, and explain concepts step by step.";
-    }
+            <div class="market-chart-wrap">
+              <canvas id="marketChart" aria-label="Supply and demand market chart" role="img"></canvas>
+            </div>
 
+            <div class="equilibrium-results">
+              <div><span>BUYER PRICE</span><strong id="buyerPrice">50.0</strong></div>
+              <div><span>SELLER PRICE</span><strong id="sellerPrice">50.0</strong></div>
+              <div><span>QUANTITY</span><strong id="equilibriumQuantity">50.0</strong></div>
+            </div>
+            <p class="chart-footnote">Illustrative linear market model. Prices and quantities are expressed in model units.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    function sendMessage(question) {
+    <!-- CALCULATORS -->
+    <section class="section section-wrap" id="calculators">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow">03 — ECONOMIC TOOLKIT</div>
+          <h2>Calculate. <span>Understand.</span></h2>
+        </div>
+        <p class="section-intro">
+          Move beyond memorizing formulas. Use them, test them
+          and understand what the results mean.
+        </p>
+      </div>
 
-        const cleanQuestion = question.trim();
+      <div class="calculator-grid">
 
-        if (!cleanQuestion) return;
+        <!-- ELASTICITY -->
+        <article class="calculator-card">
+          <div class="calculator-card-header">
+            <span class="calc-icon">ε</span>
+            <span class="calc-category">MICROECONOMICS</span>
+          </div>
+          <h3>Price elasticity of demand</h3>
+          <p>Measure how responsive quantity demanded is to a price change using the midpoint method.</p>
 
-        addMessage(cleanQuestion, "user");
+          <div class="calc-inputs two-columns">
+            <label>Initial price (P1)<input id="p1" type="number" value="10" step="any"></label>
+            <label>New price (P2)<input id="p2" type="number" value="12" step="any"></label>
+            <label>Initial quantity (Q1)<input id="q1" type="number" value="100" step="any"></label>
+            <label>New quantity (Q2)<input id="q2" type="number" value="80" step="any"></label>
+          </div>
 
-        const answer = getEconomicsAnswer(cleanQuestion);
+          <button class="button button-dark calc-button" id="calculateElasticity">Calculate elasticity <span>→</span></button>
+          <div class="calc-result" id="elasticityResult" aria-live="polite">Your result will appear here.</div>
+          <div class="formula-note">PED = %ΔQ / %ΔP · Midpoint method</div>
+        </article>
 
-        setTimeout(() => {
-            addMessage(answer, "bot");
-        }, 350);
-    }
+        <!-- GDP -->
+        <article class="calculator-card">
+          <div class="calculator-card-header">
+            <span class="calc-icon">Σ</span>
+            <span class="calc-category">MACROECONOMICS</span>
+          </div>
+          <h3>GDP expenditure approach</h3>
+          <p>Calculate gross domestic product from consumption, investment, government purchases and net exports.</p>
 
+          <div class="calc-inputs two-columns">
+            <label>Consumption (C)<input id="gdpC" type="number" value="500" step="any"></label>
+            <label>Investment (I)<input id="gdpI" type="number" value="150" step="any"></label>
+            <label>Government (G)<input id="gdpG" type="number" value="200" step="any"></label>
+            <label>Exports (X)<input id="gdpX" type="number" value="120" step="any"></label>
+            <label>Imports (M)<input id="gdpM" type="number" value="90" step="any"></label>
+          </div>
 
-    form.addEventListener("submit", (event) => {
-        event.preventDefault();
+          <button class="button button-dark calc-button" id="calculateGDP">Calculate GDP <span>→</span></button>
+          <div class="calc-result" id="gdpResult" aria-live="polite">Your result will appear here.</div>
+          <div class="formula-note">GDP = C + I + G + (X − M)</div>
+        </article>
 
-        sendMessage(input.value);
-        input.value = "";
-    });
+        <!-- HHI -->
+        <article class="calculator-card">
+          <div class="calculator-card-header">
+            <span class="calc-icon">▥</span>
+            <span class="calc-category">INDUSTRIAL ORGANIZATION</span>
+          </div>
+          <h3>Market concentration (HHI)</h3>
+          <p>Estimate market concentration by summing the squared market shares of competing firms.</p>
 
+          <label class="full-input">Market shares (%)<textarea id="hhiShares" rows="3">40, 30, 20, 10</textarea></label>
+          <span class="input-hint">Separate each firm's market share with a comma. Shares should total 100%.</span>
 
-    suggestions.forEach(button => {
-        button.addEventListener("click", () => {
-            openChat();
-            sendMessage(button.dataset.question);
-        });
-    });
+          <button class="button button-dark calc-button" id="calculateHHI">Calculate HHI <span>→</span></button>
+          <div class="calc-result" id="hhiResult" aria-live="polite">Your result will appear here.</div>
+          <div class="formula-note">HHI = Σ (market share)²</div>
+        </article>
 
-});
+        <!-- STATISTICS -->
+        <article class="calculator-card">
+          <div class="calculator-card-header">
+            <span class="calc-icon">x̄</span>
+            <span class="calc-category">DESCRIPTIVE STATISTICS</span>
+          </div>
+          <h3>Descriptive statistics</h3>
+          <p>Explore the central tendency and dispersion of a dataset.</p>
 
+          <label class="full-input">Your dataset<textarea id="statsData" rows="3">10, 15, 20, 20, 25, 30</textarea></label>
+          <span class="input-hint">Enter numerical observations separated by commas.</span>
 
-<script src="script.js"></script>
+          <button class="button button-dark calc-button" id="calculateStats">Analyze dataset <span>→</span></button>
+          <div class="calc-result stats-result" id="statsResult" aria-live="polite">Your results will appear here.</div>
+          <div class="formula-note">Mean · Median · Mode · Range · Q1 · Q3</div>
+        </article>
+      </div>
+    </section>
+
+    <!-- OBSERVATORY -->
+    <section class="section observatory-section" id="observatory">
+      <div class="section-wrap">
+        <div class="observatory-header">
+          <div>
+            <div class="eyebrow">04 — ECONOMIC INTELLIGENCE</div>
+            <h2>The Economic <span>Observatory.</span></h2>
+            <p>Connect economic theory to the world around you. Explore the indicators that help describe an economy.</p>
+          </div>
+          <span class="observatory-mark">E / O</span>
+        </div>
+
+        <div class="indicator-grid">
+          <article class="indicator-card">
+            <span class="indicator-number">01</span>
+            <span class="indicator-symbol">GDP</span>
+            <h3>Economic output</h3>
+            <p>Measure the value of final goods and services produced within an economy.</p>
+            <span class="indicator-question">What is being produced?</span>
+          </article>
+          <article class="indicator-card">
+            <span class="indicator-number">02</span>
+            <span class="indicator-symbol">%</span>
+            <h3>Inflation</h3>
+            <p>Track changes in the general price level and their implications for purchasing power.</p>
+            <span class="indicator-question">How are prices changing?</span>
+          </article>
+          <article class="indicator-card">
+            <span class="indicator-number">03</span>
+            <span class="indicator-symbol">↗</span>
+            <h3>Employment</h3>
+            <p>Examine labour market participation, employment and unemployment.</p>
+            <span class="indicator-question">Who is working?</span>
+          </article>
+          <article class="indicator-card">
+            <span class="indicator-number">04</span>
+            <span class="indicator-symbol">⇄</span>
+            <h3>International trade</h3>
+            <p>Understand exports, imports, trade balances and global economic relationships.</p>
+            <span class="indicator-question">How does the economy connect?</span>
+          </article>
+        </div>
+
+        <div class="observatory-disclaimer">
+          <span>RESEARCH NOTE</span>
+          <p>This is a conceptual learning section, not a live statistical database. Country indicators should be added with dated, verifiable sources before being presented as current data.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOPICS -->
+    <section class="section section-wrap topics-section" id="topics">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow">05 — KNOWLEDGE LIBRARY</div>
+          <h2>Build your <span>foundations.</span></h2>
+        </div>
+        <p class="section-intro">Explore essential concepts across the three levels of economic analysis.</p>
+      </div>
+
+      <div class="topic-groups">
+        <div class="topic-group" id="micro-topics">
+          <div class="topic-group-heading"><span>01</span><h3>Microeconomics</h3></div>
+          <div class="topic-list">
+            <button class="topic-item" data-question="Explain scarcity and choice in economics."><span>Scarcity and choice</span><span>↗</span></button>
+            <button class="topic-item" data-question="Explain opportunity cost with an example."><span>Opportunity cost</span><span>↗</span></button>
+            <button class="topic-item" data-question="Explain supply and demand and market equilibrium."><span>Supply and demand</span><span>↗</span></button>
+            <button class="topic-item" data-question="Explain price elasticity of demand."><span>Price elasticity</span><span>↗</span></button>
+            <button class="topic-item" data-question="Explain consumer utility and preferences."><span>Utility and preferences</span><span>↗</span></button>
+            <button class="topic-item" data-question="Explain production costs and marginal cost."><span>Production and costs</span><span>↗</span></button>
+            <button class="topic-item" data-question="Explain monopoly, oligopoly and perfect competition."><span>Market structures</span><span>↗</span></button>
+          </div>
+        </div>
+
+        <div class="topic-group" id="meso-topics">
+          <div class="topic-group-heading"><span>02</span><h3>Mesoeconomics</h3></div>
+          <div class="topic-list">
+            <button class="topic-item" data-question="Explain value chains in mesoeconomics."><span>Value chains</span><span>↗</span></button>
+            <button class="topic-item" data-question="What are industrial clusters?"><span>Industrial clusters</span><span>↗</span></button>
+            <button class="topic-item" data-question="Explain sectoral productivity."><span>Sectoral productivity</span><span>↗</span></button>
+            <button class="topic-item" data-question="Explain market concentration and HHI."><span>Market concentration</span><span>↗</span></button>
+            <button class="topic-item" data-question="Explain regional economic development."><span>Regional development</span><span>↗</span></button>
+            <button class="topic-item" data-question="Explain supply chains and industrial organization."><span>Supply chains</span><span>↗</span></button>
+          </div>
+        </div>
+
+        <div class="topic-group" id="macro-topics">
+          <div class="topic-group-heading"><span>03</span><h3>Macroeconomics</h3></div>
+          <div class="topic-list">
+            <button class="topic-item" data-question="Explain GDP and the expenditure approach."><span>GDP and national income</span><span>↗</span></button>
+            <button class="topic-item" data-question="Explain inflation and how it is measured."><span>Inflation</span><span>↗</span></button>
+            <button class="topic-item" data-question="Explain unemployment and its different types."><span>Unemployment</span><span>↗</span></button>
+            <button class="topic-item" data-question="Explain economic growth."><span>Economic growth</span><span>↗</span></button>
+            <button class="topic-item" data-question="Explain monetary policy and interest rates."><span>Monetary policy</span><span>↗</span></button>
+            <button class="topic-item" data-question="Explain fiscal policy and government spending."><span>Fiscal policy</span><span>↗</span></button>
+            <button class="topic-item" data-question="Explain international trade and net exports."><span>International trade</span><span>↗</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CROSS LEVEL -->
+    <section class="cross-level-section">
+      <div class="section-wrap cross-level-inner">
+        <div>
+          <div class="eyebrow">THINK ACROSS LEVELS</div>
+          <h2>One phenomenon.<br><span>Three perspectives.</span></h2>
+          <p>Consider an increase in the price of oil. The same event can be understood through individual choices, industrial structures and the national economy.</p>
+        </div>
+
+        <div class="perspective-stack">
+          <article><span>MICRO</span><div><strong>The consumer</strong><p>How do households adjust their consumption?</p></div></article>
+          <article><span>MESO</span><div><strong>The industry</strong><p>How are transport and manufacturing value chains affected?</p></div></article>
+          <article><span>MACRO</span><div><strong>The economy</strong><p>How might inflation and national output respond?</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section section-wrap about-section" id="about">
+      <div class="about-left">
+        <div class="eyebrow">06 — THE IDEA</div>
+        <h2>Economics should be <span>experienced.</span></h2>
+      </div>
+      <div class="about-right">
+        <p>ÉcoLab is an interactive learning project designed to make economics more accessible, intuitive and practical.</p>
+        <p>Instead of approaching economics as a collection of disconnected formulas, ÉcoLab connects concepts, calculations and real-world economic systems.</p>
+        <div class="about-principles">
+          <span>ACCESSIBILITY</span><span>INTERACTIVITY</span><span>ECONOMIC THINKING</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="section-wrap footer-inner">
+      <a class="brand footer-brand" href="#home"><span class="brand-mark">É</span><span>ÉcoLab<span class="brand-dot">.</span></span></a>
+      <p>Understand the economy. Change the variables.</p>
+      <a href="#home" class="back-top">BACK TO TOP ↑</a>
+    </div>
+    <div class="section-wrap footer-bottom">
+      <span>© <span id="currentYear"></span> ÉcoLab. Educational project.</span>
+      <span>BUILT TO MAKE ECONOMICS CLICK.</span>
+    </div>
+  </footer>
+
+  <!-- ÉCOBOT LAUNCHER -->
+  <button class="ecobot-launcher" id="ecobotLauncher"
+    aria-label="Open ÉcoBot" aria-expanded="false" aria-controls="ecobotWindow">
+    <span class="ecobot-launcher-icon">✳</span>
+    <span class="ecobot-launcher-label">Ask ÉcoBot</span>
+  </button>
+
+  <!-- ÉCOBOT CHAT WINDOW -->
+  <section class="ecobot-window" id="ecobotWindow"
+    aria-label="ÉcoBot economics tutor" hidden>
+
+    <header class="ecobot-header">
+      <div class="ecobot-avatar">É</div>
+      <div class="ecobot-identity">
+        <strong>ÉcoBot</strong>
+        <span><i></i> Your economics tutor</span>
+      </div>
+      <button id="ecobotClose" class="ecobot-close" aria-label="Close chatbot">×</button>
+    </header>
+
+    <div class="ecobot-context">
+      <span>LEARNING DOMAIN</span>
+      <select id="ecobotDomain" aria-label="Choose economics domain">
+        <option value="general">General economics</option>
+        <option value="micro">Microeconomics</option>
+        <option value="meso">Mesoeconomics</option>
+        <option value="macro">Macroeconomics</option>
+        <option value="statistics">Statistics</option>
+      </select>
+    </div>
+
+    <div class="ecobot-messages" id="ecobotMessages" aria-live="polite">
+      <div class="bot-message">
+        <span class="message-label">ÉCOBOT · WELCOME</span>
+        <p>Hello! I'm ÉcoBot, your personal economics tutor.</p>
+        <p>Ask me about an economic concept, a formula, a calculation or a real-world phenomenon. Where shall we begin?</p>
+      </div>
+
+      <div class="ecobot-suggestions">
+        <button class="suggestion-chip" data-question="Explain the difference between microeconomics and macroeconomics.">Micro vs Macro</button>
+        <button class="suggestion-chip" data-question="Explain price elasticity of demand with an example.">Price elasticity</button>
+        <button class="suggestion-chip" data-question="Teach me how to calculate GDP.">Calculate GDP</button>
+        <button class="suggestion-chip" data-question="Explain the difference between mean and median.">Statistics</button>
+      </div>
+    </div>
+
+    <form class="ecobot-form" id="ecobotForm">
+      <input type="text" id="ecobotInput"
+        placeholder="Ask an economics question..."
+        autocomplete="off" aria-label="Your question" required>
+      <button type="submit" aria-label="Send message">↑</button>
+    </form>
+
+    <div class="ecobot-footer">ÉCOLAB · LEARN BY UNDERSTANDING</div>
+  </section>
+
 </body>
 </html>
