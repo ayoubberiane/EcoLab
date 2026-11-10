@@ -1,1820 +1,1519 @@
 
-/* ==========================================
-   ÉCOLAB — COMPLETE DESIGN SYSTEM
-========================================== */
-
-:root {
-  --bg: #f5f6f0;
-  --surface: #ffffff;
-  --ink: #17251e;
-  --muted: #718075;
-  --line: #e1e7dd;
-  --green: #b9f36b;
-  --green-dark: #263b2d;
-  --green-soft: #eaf2e3;
-  --blue: #91abc8;
-  --mono: "DM Mono", monospace;
-  --sans: "DM Sans", sans-serif;
-  --display: "Manrope", sans-serif;
-  --radius: 14px;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  scroll-behavior: smooth;
-  scroll-padding-top: 90px;
-}
-
-body {
-  background: var(--bg);
-  color: var(--ink);
-  font-family: var(--sans);
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-}
-
-button, input, textarea, select {
-  font: inherit;
-}
-
-button, a {
-  -webkit-tap-highlight-color: transparent;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-button {
-  cursor: pointer;
-}
-
-.section-wrap {
-  width: min(1160px, calc(100% - 64px));
-  margin-inline: auto;
-}
-
-.section {
-  padding-top: 112px;
-  padding-bottom: 112px;
-}
-
-.eyebrow {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 1.7px;
-  color: #78897a;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-}
-
-.live-dot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  background: var(--green);
-  border-radius: 50%;
-  box-shadow: 0 0 0 4px #b9f36b22;
-}
-
-h1, h2, h3 {
-  font-family: var(--display);
-  letter-spacing: -1.6px;
-  line-height: 1.12;
-}
-
-h2 {
-  font-size: clamp(34px, 4.3vw, 54px);
-  font-weight: 700;
-}
-
-h2 span, h1 span {
-  color: #759b53;
-}
-
-.section-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  gap: 35px;
-  margin-bottom: 43px;
-}
-
-.section-heading h2 {
-  margin-top: 15px;
-}
-
-.section-intro {
-  max-width: 340px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.9;
-}
-
-/* ==========================================
-   NAVIGATION
-========================================== */
-
-.site-header {
-  height: 78px;
-  padding-inline: max(32px, calc((100% - 1160px) / 2));
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #f5f6f0ee;
-  border-bottom: 1px solid #e4e9e0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  backdrop-filter: blur(16px);
-}
-
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font: 800 21px var(--display);
-  letter-spacing: -1px;
-}
-
-.brand-mark {
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  background: var(--ink);
-  color: var(--green);
-  border-radius: 9px;
-  font-size: 18px;
-}
-
-.brand-dot {
-  color: #83ad5e;
-}
-
-.main-nav {
-  display: flex;
-  align-items: center;
-  gap: 29px;
-}
-
-.main-nav > a {
-  font-size: 11px;
-  font-weight: 600;
-  color: #536158;
-  transition: color .2s;
-}
-
-.main-nav > a:hover {
-  color: #789e55;
-}
-
-.main-nav .nav-cta {
-  padding: 11px 15px;
-  border-radius: 6px;
-  color: white;
-  background: var(--ink);
-}
-
-.nav-cta span {
-  color: var(--green);
-  margin-left: 8px;
-}
-
-.menu-toggle {
-  display: none;
-  border: 0;
-  background: transparent;
-  width: 35px;
-  height: 35px;
-}
-
-.menu-toggle span {
-  display: block;
-  width: 23px;
-  height: 2px;
-  background: var(--ink);
-  margin: 5px auto;
-}
-
-/* ==========================================
-   HERO
-========================================== */
-
-.hero {
-  min-height: 650px;
-  display: grid;
-  grid-template-columns: 1.1fr .9fr;
-  align-items: center;
-  gap: 55px;
-  padding-top: 85px;
-  padding-bottom: 90px;
-}
-
-.hero h1 {
-  font-size: clamp(42px, 5.4vw, 68px);
-  font-weight: 800;
-  margin-top: 27px;
-  letter-spacing: -3.8px;
-  line-height: 1.1;
-}
-
-.hero h1 span {
-  color: #83a95e;
-}
-
-.hero-description {
-  max-width: 525px;
-  margin-top: 25px;
-  color: #718075;
-  font-size: 14px;
-  line-height: 2;
-}
-
-.hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 32px;
-}
-
-.button {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  gap: 17px;
-  min-height: 48px;
-  padding: 0 19px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  border: 1px solid transparent;
-  transition: .22s ease;
-}
-
-.button-primary {
-  color: white;
-  background: var(--ink);
-}
-
-.button-primary span {
-  color: var(--green);
-}
-
-.button-primary:hover, .button-dark:hover {
-  background: #344d39;
-  transform: translateY(-2px);
-}
-
-.button-secondary {
-  border-color: #dce4d8;
-  color: #405044;
-  background: transparent;
-}
-
-.button-secondary:hover {
-  border-color: #9eb58d;
-  background: #eef3e9;
-}
-
-.hero-note {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  margin-top: 60px;
-  font: 9px var(--mono);
-  color: #8c9a8d;
-  letter-spacing: 1.2px;
-}
-
-.hero-note-line {
-  width: 28px;
-  height: 1px;
-  background: #8caa73;
-}
-
-/* HERO VISUAL */
-
-.hero-visual {
-  background: #17251e;
-  border-radius: 13px;
-  color: white;
-  padding: 20px 21px 17px;
-  box-shadow: 0 24px 65px #17251e17;
-}
-
-.visual-topline, .visual-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font: 8px var(--mono);
-  letter-spacing: 1px;
-  color: #a7b5a9;
-}
-
-.visual-topline span:last-child {
-  color: var(--green);
-}
-
-.visual-chart {
-  position: relative;
-  margin-top: 25px;
-  padding: 0 0 8px;
-}
-
-.visual-chart svg {
-  width: 100%;
-  display: block;
-}
-
-.chart-label {
-  position: absolute;
-  color: #7e9382;
-  font: 8px var(--mono);
-  letter-spacing: 1px;
-}
-
-.chart-label-y {
-  left: -4px;
-  top: 4px;
-  transform: rotate(-90deg) translateX(-100%);
-  transform-origin: left top;
-}
-
-.chart-label-x {
-  right: 5px;
-  bottom: -2px;
-}
-
-.visual-bottom {
-  padding-top: 18px;
-  border-top: 1px solid #35463a;
-  gap: 12px;
-}
-
-.visual-bottom > div {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.metric-label {
-  font-size: 8px;
-  color: #7e9382;
-}
-
-.visual-bottom strong {
-  font-size: 9px;
-  color: #e6eee5;
-  font-weight: 500;
-}
-
-.visual-status {
-  color: var(--green);
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 8px;
-}
-
-/* ==========================================
-   INTRO STRIP
-========================================== */
-
-.intro-strip {
-  background: #eaf0e5;
-  border-block: 1px solid #dfe7d9;
-}
-
-.intro-inner {
-  min-height: 83px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 25px;
-}
-
-.intro-inner > p {
-  font: 9px var(--mono);
-  color: #819080;
-  letter-spacing: 1.2px;
-}
-
-.intro-levels {
-  display: flex;
-  gap: 36px;
-}
-
-.intro-levels span {
-  font: 10px var(--mono);
-  color: #536b50;
-}
-
-/* ==========================================
-   LAB CARDS
-========================================== */
-
-.lab-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 19px;
-}
-
-.lab-card {
-  background: white;
-  border: 1px solid #e5eae1;
-  border-radius: var(--radius);
-  padding: 22px;
-  transition: transform .25s, box-shadow .25s;
-  min-width: 0;
-}
-
-.lab-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 18px 45px #17251e0d;
-}
-
-.lab-card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.lab-number {
-  font: 12px var(--mono);
-  color: #8aa56d;
-}
-
-.lab-tag {
-  font: 8px var(--mono);
-  color: #8a978c;
-  letter-spacing: .8px;
-}
-
-.lab-art {
-  height: 185px;
-  border-radius: 9px;
-  margin: 22px 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.art-micro {
-  background: #eff4e9;
-}
-
-.micro-orbit {
-  position: absolute;
-  border: 1px solid #aac795;
-  border-radius: 50%;
-  transform: rotate(-30deg);
-}
-
-.orbit-one {
-  width: 220px;
-  height: 90px;
-}
-
-.orbit-two {
-  width: 160px;
-  height: 160px;
-  transform: rotate(60deg);
-}
-
-.micro-core {
-  width: 59px;
-  height: 59px;
-  background: #263d2d;
-  color: var(--green);
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  font: 25px var(--display);
-  z-index: 1;
-}
-
-.art-node {
-  position: absolute;
-  width: 28px;
-  height: 28px;
-  display: grid;
-  place-items: center;
-  background: white;
-  border: 1px solid #cbdcc0;
-  border-radius: 50%;
-  color: #4f7040;
-  font: 10px var(--mono);
-  z-index: 2;
-}
-
-.node-a { top: 30px; left: 70px; }
-.node-b { right: 65px; top: 75px; }
-.node-c { bottom: 25px; left: 105px; }
-
-.art-meso {
-  background: #edf1f5;
-}
-
-.network-line {
-  position: absolute;
-  height: 1px;
-  background: #9fb2c7;
-  transform-origin: left center;
-}
-
-.line-one { width: 160px; top: 58px; left: 77px; transform: rotate(24deg); }
-.line-two { width: 145px; top: 115px; left: 82px; transform: rotate(-27deg); }
-.line-three { width: 100px; top: 54px; left: 160px; transform: rotate(72deg); }
-
-.network-node {
-  width: 37px;
-  height: 37px;
-  border: 1px solid #b1c1d1;
-  border-radius: 50%;
-  background: #fff;
-  display: grid;
-  place-items: center;
-  color: #56718e;
-  font: 11px var(--mono);
-  position: absolute;
-  z-index: 2;
-}
-
-.n-one { top: 27px; left: 58px; }
-.n-two { top: 42px; left: 180px; }
-.n-three { top: 115px; left: 98px; }
-.n-four { top: 105px; right: 45px; }
-.n-five { bottom: 10px; left: 205px; }
-
-.art-macro {
-  background: #f2f0e8;
-  align-items: end;
-  padding: 35px 38px;
-}
-
-.macro-bars {
-  height: 120px;
-  width: 100%;
-  display: flex;
-  align-items: end;
-  gap: 12px;
-  position: relative;
-  z-index: 2;
-}
-
-.macro-bars span {
-  flex: 1;
-  background: #a4c67f;
-  border-radius: 3px 3px 0 0;
-}
-
-.macro-trend {
-  position: absolute;
-  left: 48px;
-  right: 42px;
-  top: 55px;
-  height: 80px;
-  border-top: 3px solid #718d63;
-  transform: skewY(-20deg);
-  opacity: .7;
-}
-
-.lab-card h3 {
-  font-size: 22px;
-  letter-spacing: -.8px;
-}
-
-.lab-card > p {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.9;
-  margin-top: 10px;
-  min-height: 70px;
-}
-
-.topic-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 19px;
-}
-
-.topic-tags span {
-  background: #f0f4ec;
-  color: #65775e;
-  padding: 6px 8px;
-  font-size: 9px;
-  border-radius: 4px;
-}
-
-.text-link {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 24px;
-  padding-top: 15px;
-  border-top: 1px solid #e9ede6;
-  font-size: 10px;
-  font-weight: 700;
-  color: #46613f;
-}
-
-.text-link span {
-  font-size: 16px;
-}
-
-/* ==========================================
-   SIMULATOR
-========================================== */
-
-.simulator-section {
-  background: #17251e;
-  color: white;
-}
-
-.simulator-section .eyebrow {
-  color: #9aab9c;
-}
-
-.simulator-section h2 span {
-  color: var(--green);
-}
-
-.simulator-section .section-intro {
-  color: #a3b1a5;
-}
-
-.simulator-layout {
-  display: grid;
-  grid-template-columns: .75fr 1.25fr;
-  gap: 19px;
-}
-
-.sim-controls, .sim-chart-panel {
-  background: #22342a;
-  border: 1px solid #36483b;
-  border-radius: var(--radius);
-  padding: 25px;
-  min-width: 0;
-}
-
-.panel-heading, .chart-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-}
-
-.panel-index {
-  display: block;
-  font: 8px var(--mono);
-  letter-spacing: 1.2px;
-  color: #94a997;
-}
-
-.panel-heading h3, .chart-panel-header h3 {
-  font-size: 19px;
-  margin-top: 6px;
-  letter-spacing: -.5px;
-}
-
-.reset-button {
-  background: transparent;
-  border: 1px solid #526657;
-  color: #c4d1c4;
-  padding: 8px 11px;
-  border-radius: 5px;
-  font-size: 9px;
-}
-
-.slider-control {
-  margin-top: 33px;
-}
-
-.slider-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 11px;
-  color: #e4ece3;
-}
-
-.slider-title output {
-  font: 12px var(--mono);
-  color: var(--green);
-}
-
-.slider-control input[type="range"] {
-  appearance: none;
-  width: 100%;
-  height: 4px;
-  background: #506355;
-  border-radius: 5px;
-  margin-top: 19px;
-  accent-color: var(--green);
-  cursor: pointer;
-}
-
-.slider-control input[type="range"]::-webkit-slider-thumb {
-  appearance: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--green);
-  border: 2px solid #17251e;
-}
-
-.slider-control input[type="range"]::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--green);
-  border: 2px solid #17251e;
-}
-
-.range-labels {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 5px;
-  font: 8px var(--mono);
-  color: #859889;
-}
-
-.model-explanation {
-  display: flex;
-  gap: 12px;
-  align-items: start;
-  background: #2b4131;
-  border: 1px solid #405743;
-  border-radius: 8px;
-  margin-top: 33px;
-  padding: 14px;
-}
-
-.explanation-icon {
-  color: var(--green);
-  font-size: 18px;
-}
-
-.model-explanation p {
-  color: #d0dbd0;
-  font-size: 10px;
-  line-height: 1.8;
-}
-
-.chart-live {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font: 8px var(--mono);
-  color: var(--green);
-}
-
-.market-chart-wrap {
-  height: 300px;
-  margin-top: 18px;
-  width: 100%;
-}
-
-#marketChart {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.equilibrium-results {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  border-top: 1px solid #3b4d40;
-  padding-top: 19px;
-}
-
-.equilibrium-results div {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.equilibrium-results span {
-  font: 8px var(--mono);
-  color: #91a294;
-  letter-spacing: .6px;
-}
-
-.equilibrium-results strong {
-  font: 20px var(--display);
-  color: var(--green);
-}
-
-.chart-footnote {
-  margin-top: 15px;
-  font-size: 9px;
-  color: #91a294;
-}
-
-/* ==========================================
-   CALCULATORS
-========================================== */
-
-.calculator-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 19px;
-}
-
-.calculator-card {
-  background: white;
-  border: 1px solid #e4e9e1;
-  border-radius: var(--radius);
-  padding: 25px;
-  min-width: 0;
-}
-
-.calculator-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.calc-icon {
-  width: 39px;
-  height: 39px;
-  display: grid;
-  place-items: center;
-  border-radius: 9px;
-  background: #edf4e7;
-  color: #668d4b;
-  font: 20px var(--display);
-}
-
-.calc-category {
-  font: 8px var(--mono);
-  letter-spacing: 1px;
-  color: #8a998b;
-}
-
-.calculator-card h3 {
-  font-size: 20px;
-  margin-top: 19px;
-  letter-spacing: -.7px;
-}
-
-.calculator-card > p {
-  font-size: 11px;
-  line-height: 1.8;
-  color: var(--muted);
-  margin-top: 8px;
-  min-height: 40px;
-}
-
-.calc-inputs {
-  display: grid;
-  gap: 13px;
-  margin-top: 21px;
-}
-
-.two-columns {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.calc-inputs label, .full-input {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  color: #58665b;
-  font-size: 10px;
-  font-weight: 600;
-  min-width: 0;
-}
-
-.calc-inputs input, .full-input textarea {
-  width: 100%;
-  border: 1px solid #e0e7dd;
-  background: #fafbf8;
-  padding: 11px;
-  border-radius: 5px;
-  color: var(--ink);
-  font-size: 12px;
-  outline: none;
-}
-
-.calc-inputs input:focus, .full-input textarea:focus {
-  border-color: #99ba7b;
-}
-
-.full-input {
-  margin-top: 22px;
-}
-
-.full-input textarea {
-  resize: vertical;
-  font-family: var(--mono);
-  line-height: 1.6;
-}
-
-.input-hint {
-  display: block;
-  margin-top: 7px;
-  color: #89958b;
-  font-size: 9px;
-}
-
-.calc-button {
-  margin-top: 20px;
-  width: 100%;
-  min-height: 43px;
-  border: none;
-}
-
-.button-dark {
-  background: #1e3025;
-  color: white;
-}
-
-.button-dark span {
-  color: var(--green);
-}
-
-.calc-result {
-  min-height: 58px;
-  margin-top: 13px;
-  padding: 12px;
-  border-radius: 6px;
-  background: #f0f4eb;
-  color: #607458;
-  font-size: 10px;
-  line-height: 1.8;
-  white-space: pre-line;
-  overflow-wrap: anywhere;
-}
-
-.calc-result strong {
-  color: #304b30;
-}
-
-.calc-result.error {
-  background: #fff0ec;
-  color: #9d4939;
-}
-
-.stats-result {
-  min-height: 100px;
-}
-
-.formula-note {
-  margin-top: 13px;
-  font: 9px var(--mono);
-  color: #8b998a;
-}
-
-/* ==========================================
-   OBSERVATORY
-========================================== */
-
-.observatory-section {
-  background: #eaf0e5;
-  border-block: 1px solid #dce6d6;
-}
-
-.observatory-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 30px;
-  margin-bottom: 39px;
-}
-
-.observatory-header h2 {
-  margin-top: 14px;
-}
-
-.observatory-header > div > p {
-  max-width: 580px;
-  margin-top: 17px;
-  color: #708071;
-  font-size: 13px;
-  line-height: 1.9;
-}
-
-.observatory-mark {
-  width: 105px;
-  height: 105px;
-  border: 1px solid #c6d6bd;
-  color: #7b9b67;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  font: 18px var(--mono);
-  flex-shrink: 0;
-}
-
-.indicator-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 13px;
-}
-
-.indicator-card {
-  padding: 21px;
-  background: #f9fbf7;
-  border: 1px solid #dfe8d9;
-  border-radius: 10px;
-}
-
-.indicator-number {
-  font: 9px var(--mono);
-  color: #8da17f;
-}
-
-.indicator-symbol {
-  display: block;
-  margin-top: 27px;
-  color: #7fa45e;
-  font: 31px var(--display);
-}
-
-.indicator-card h3 {
-  margin-top: 10px;
-  font-size: 16px;
-  letter-spacing: -.4px;
-}
-
-.indicator-card p {
-  margin-top: 9px;
-  color: #788579;
-  font-size: 10px;
-  line-height: 1.9;
-  min-height: 75px;
-}
-
-.indicator-question {
-  display: block;
-  border-top: 1px solid #e2e9dd;
-  padding-top: 13px;
-  margin-top: 16px;
-  font-size: 9px;
-  color: #617a56;
-  font-weight: 700;
-}
-
-.observatory-disclaimer {
-  margin-top: 22px;
-  padding: 17px 20px;
-  border-left: 2px solid #91b56d;
-  background: #f5f8f1;
-  display: flex;
-  gap: 22px;
-  align-items: baseline;
-}
-
-.observatory-disclaimer span {
-  font: 9px var(--mono);
-  color: #688456;
-  white-space: nowrap;
-}
-
-.observatory-disclaimer p {
-  color: #778477;
-  font-size: 10px;
-  line-height: 1.8;
-}
-
-/* ==========================================
-   TOPICS
-========================================== */
-
-.topic-groups {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-
-.topic-group-heading {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #dce5d8;
-}
-
-.topic-group-heading > span {
-  font: 10px var(--mono);
-  color: #82a56a;
-}
-
-.topic-group-heading h3 {
-  font-size: 17px;
-  letter-spacing: -.5px;
-}
-
-.topic-item {
-  width: 100%;
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid #e4e9e1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 15px 3px;
-  text-align: left;
-  color: #5c6b5e;
-  font-size: 11px;
-  transition: .2s;
-}
-
-.topic-item span:last-child {
-  color: #83a666;
-  font-size: 15px;
-}
-
-.topic-item:hover {
-  color: #4f7740;
-  padding-left: 8px;
-}
-
-/* ==========================================
-   CROSS LEVEL
-========================================== */
-
-.cross-level-section {
-  background: #17251e;
-  color: white;
-  padding-block: 95px;
-}
-
-.cross-level-inner {
-  display: grid;
-  grid-template-columns: .9fr 1.1fr;
-  gap: 75px;
-  align-items: center;
-}
-
-.cross-level-inner .eyebrow {
-  color: #9cae9f;
-}
-
-.cross-level-inner h2 {
-  margin-top: 20px;
-  font-size: clamp(35px, 4vw, 49px);
-}
-
-.cross-level-inner h2 span {
-  color: var(--green);
-}
-
-.cross-level-inner > div:first-child > p {
-  color: #aab8ac;
-  font-size: 12px;
-  line-height: 2;
-  margin-top: 23px;
-  max-width: 420px;
-}
-
-.perspective-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.perspective-stack article {
-  display: flex;
-  align-items: center;
-  gap: 22px;
-  padding: 18px;
-  background: #22342a;
-  border: 1px solid #3a4e3e;
-  border-radius: 8px;
-}
-
-.perspective-stack article > span {
-  width: 58px;
-  flex-shrink: 0;
-  color: var(--green);
-  font: 9px var(--mono);
-}
-
-.perspective-stack strong {
-  font-size: 13px;
-}
-
-.perspective-stack p {
-  margin-top: 3px;
-  color: #a7b5a9;
-  font-size: 10px;
-}
-
-/* ==========================================
-   ABOUT
-========================================== */
-
-.about-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 70px;
-  align-items: start;
-}
-
-.about-left h2 {
-  margin-top: 20px;
-}
-
-.about-right > p {
-  color: #68786c;
-  font-size: 13px;
-  line-height: 2;
-  margin-bottom: 17px;
-}
-
-.about-principles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 26px;
-}
-
-.about-principles span {
-  padding: 9px 11px;
-  background: #eaf1e4;
-  color: #607a53;
-  font: 8px var(--mono);
-  border-radius: 4px;
-}
+/* =====================================================
+   ÉCOLAB — COMPLETE JAVASCRIPT
+   Navigation · Market simulator · Calculators · ÉcoBot
+===================================================== */
 
-/* ==========================================
-   FOOTER
-========================================== */
-
-.site-footer {
-  background: #17251e;
-  color: white;
-  padding-top: 37px;
-}
-
-.footer-inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-  padding-bottom: 30px;
-}
+"use strict";
 
-.footer-brand {
-  font-size: 18px;
-}
+/* =====================================================
+   1. GENERAL UTILITIES
+===================================================== */
 
-.footer-brand .brand-mark {
-  background: #2d4132;
-}
+const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => [...document.querySelectorAll(selector)];
 
-.footer-inner > p {
-  color: #9aab9c;
-  font-size: 10px;
+function formatNumber(value, digits = 2) {
+  return Number(value).toLocaleString(undefined, {
+    maximumFractionDigits: digits,
+    minimumFractionDigits: 0
+  });
 }
 
-.back-top {
-  font: 9px var(--mono);
-  color: var(--green);
-}
+function readNumber(id) {
+  const element = document.getElementById(id);
+  if (!element) return NaN;
 
-.footer-bottom {
-  border-top: 1px solid #35463a;
-  padding-block: 18px;
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  color: #8b9b8e;
-  font: 8px var(--mono);
-  letter-spacing: .5px;
-}
+  const value = element.value.trim();
+  if (value === "") return NaN;
 
-/* ==========================================
-   ÉCOBOT
-========================================== */
-
-.ecobot-launcher {
-  position: fixed;
-  right: 27px;
-  bottom: 25px;
-  z-index: 999;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #17251e;
-  color: white;
-  border: 1px solid #34483a;
-  padding: 13px 18px;
-  border-radius: 40px;
-  box-shadow: 0 10px 35px #17251e35;
-  transition: .25s ease;
+  return Number(value);
 }
 
-.ecobot-launcher:hover {
-  transform: translateY(-4px);
-  background: #293c30;
-}
+function showResult(id, content, isError = false) {
+  const element = document.getElementById(id);
+  if (!element) return;
 
-.ecobot-launcher-icon {
-  color: var(--green);
-  font-size: 22px;
+  element.textContent = content;
+  element.classList.toggle("error", isError);
 }
 
-.ecobot-launcher-label {
-  font-size: 11px;
-  font-weight: 700;
+function escapeText(value) {
+  return String(value);
 }
 
-.ecobot-window {
-  position: fixed;
-  z-index: 1000;
-  right: 27px;
-  bottom: 91px;
-  width: min(390px, calc(100vw - 30px));
-  height: min(590px, calc(100dvh - 120px));
-  background: #f9faf6;
-  border: 1px solid #dce5d9;
-  border-radius: 17px;
-  box-shadow: 0 25px 80px #17251e30;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  animation: ecobotAppear .22s ease;
-}
+/* =====================================================
+   2. NAVIGATION
+===================================================== */
 
-.ecobot-window[hidden] {
-  display: none;
-}
+const menuToggle = $("#menuToggle");
+const mainNav = $("#mainNav");
 
-@keyframes ecobotAppear {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+if (menuToggle && mainNav) {
+  menuToggle.addEventListener("click", () => {
+    const isOpen = mainNav.classList.toggle("open");
+    menuToggle.setAttribute("aria-expanded", String(isOpen));
+  });
 
-.ecobot-header {
-  background: #17251e;
-  color: white;
-  padding: 17px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  $$("#mainNav a").forEach(link => {
+    link.addEventListener("click", () => {
+      mainNav.classList.remove("open");
+      menuToggle.setAttribute("aria-expanded", "false");
+    });
+  });
 }
 
-.ecobot-avatar {
-  width: 39px;
-  height: 39px;
-  background: var(--green);
-  color: #17251e;
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  font: 800 20px var(--display);
+const yearElement = $("#currentYear");
+if (yearElement) {
+  yearElement.textContent = new Date().getFullYear();
 }
 
-.ecobot-identity {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-}
+/* =====================================================
+   3. MARKET EQUILIBRIUM SIMULATOR
+===================================================== */
 
-.ecobot-identity strong {
-  font: 700 14px var(--display);
-}
+/*
+  Linear market model:
 
-.ecobot-identity span {
-  font-size: 9px;
-  color: #bdc9bf;
-}
+  Demand:
+  Qd = A - Pb
 
-.ecobot-identity i {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--green);
-  margin-right: 5px;
-}
+  Supply:
+  Qs = Ps - C
 
-.ecobot-close {
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 25px;
-  cursor: pointer;
-  line-height: 1;
-}
+  Tax wedge:
+  Pb = Ps + T
 
-.ecobot-context {
-  background: #edf2e9;
-  padding: 10px 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #e0e7dd;
-  gap: 10px;
-}
+  At equilibrium:
+  Qd = Qs = Q
 
-.ecobot-context > span {
-  font: 8px var(--mono);
-  letter-spacing: 1px;
-  color: #78867a;
-}
+  Therefore:
+  Q* = (A - C - T) / 2
 
-.ecobot-context select {
-  max-width: 160px;
-  border: 1px solid #d5dfd2;
-  background: white;
-  padding: 7px;
-  border-radius: 5px;
-  font-size: 10px;
-  color: #26352c;
-}
+  Pb = A - Q*
+  Ps = Pb - T
 
-.ecobot-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  scroll-behavior: smooth;
-}
+  The model assumes:
+  - Linear demand and supply.
+  - A specific per-unit tax.
+  - No externalities or other market distortions.
+*/
 
-.bot-message, .user-message {
-  max-width: 92%;
-  padding: 12px 14px;
-  border-radius: 11px;
-  font-size: 11px;
-  line-height: 1.8;
-  overflow-wrap: anywhere;
-  white-space: pre-line;
-}
+const demandSlider = $("#demandSlider");
+const supplySlider = $("#supplySlider");
+const taxSlider = $("#taxSlider");
 
-.bot-message {
-  align-self: flex-start;
-  background: white;
-  border: 1px solid #e4eae0;
-  color: #344238;
-  border-bottom-left-radius: 3px;
-}
+const demandValue = $("#demandValue");
+const supplyValue = $("#supplyValue");
+const taxValue = $("#taxValue");
 
-.user-message {
-  align-self: flex-end;
-  background: #22372a;
-  color: white;
-  border-bottom-right-radius: 3px;
-}
+const buyerPriceOutput = $("#buyerPrice");
+const sellerPriceOutput = $("#sellerPrice");
+const quantityOutput = $("#equilibriumQuantity");
 
-.message-label {
-  display: block;
-  font: 8px var(--mono);
-  letter-spacing: 1px;
-  color: #7c9d5b;
-  margin-bottom: 7px;
-}
+const marketExplanation = $("#marketExplanation");
+const marketCanvas = $("#marketChart");
 
-.bot-message p, .user-message p {
-  margin-bottom: 7px;
-}
+let marketState = null;
 
-.bot-message p:last-child, .user-message p:last-child {
-  margin-bottom: 0;
-}
+function getMarketParameters() {
+  const demandIntensity = Number(demandSlider?.value ?? 50);
+  const supplyIntensity = Number(supplySlider?.value ?? 50);
+  const tax = Number(taxSlider?.value ?? 0);
 
-.ecobot-suggestions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin-top: 3px;
-}
+  /*
+    Higher demand intensity shifts the demand intercept upward.
+    Higher supply intensity shifts the supply curve downward.
+  */
 
-.suggestion-chip {
-  border: 1px solid #dce5d8;
-  background: white;
-  color: #53664f;
-  padding: 8px 10px;
-  border-radius: 30px;
-  font-size: 9px;
-  transition: .2s;
-}
+  const demandIntercept = 70 + (demandIntensity - 50) * 0.6;
+  const supplyIntercept = 30 + (50 - supplyIntensity) * 0.6;
 
-.suggestion-chip:hover {
-  background: #eaf4e1;
-  border-color: #a9cb88;
-}
+  const quantity = Math.max(
+    0,
+    (demandIntercept - supplyIntercept - tax) / 2
+  );
 
-.ecobot-form {
-  display: flex;
-  align-items: center;
-  padding: 11px;
-  gap: 8px;
-  background: white;
-  border-top: 1px solid #e4eae0;
-}
+  const buyerPrice = demandIntercept - quantity;
+  const sellerPrice = buyerPrice - tax;
 
-.ecobot-form input {
-  flex: 1;
-  min-width: 0;
-  border: 1px solid #e0e7dc;
-  outline: none;
-  padding: 11px;
-  border-radius: 7px;
-  font-size: 10px;
+  return {
+    demandIntensity,
+    supplyIntensity,
+    tax,
+    demandIntercept,
+    supplyIntercept,
+    quantity,
+    buyerPrice,
+    sellerPrice
+  };
 }
 
-.ecobot-form input:focus {
-  border-color: #9fbd7d;
-}
+function updateMarket() {
+  if (!demandSlider || !supplySlider || !taxSlider) return;
 
-.ecobot-form button {
-  width: 39px;
-  height: 39px;
-  flex-shrink: 0;
-  border: none;
-  background: #17251e;
-  color: var(--green);
-  border-radius: 8px;
-  font-size: 21px;
-}
+  marketState = getMarketParameters();
 
-.ecobot-footer {
-  background: white;
-  text-align: center;
-  padding: 7px;
-  color: #94a094;
-  font: 8px var(--mono);
-  letter-spacing: 1px;
-}
+  const state = marketState;
 
-.ecobot-typing {
-  color: #809080;
-  font-size: 10px;
-  font-style: italic;
-  padding: 8px;
-}
+  if (demandValue) demandValue.textContent = state.demandIntensity;
+  if (supplyValue) supplyValue.textContent = state.supplyIntensity;
+  if (taxValue) taxValue.textContent = state.tax;
 
-/* ==========================================
-   RESPONSIVE DESIGN
-========================================== */
-
-@media (max-width: 900px) {
-  .hero {
-    grid-template-columns: 1fr;
-    gap: 45px;
-    padding-top: 65px;
+  if (buyerPriceOutput) {
+    buyerPriceOutput.textContent = formatNumber(state.buyerPrice);
   }
 
-  .hero-visual {
-    max-width: 650px;
+  if (sellerPriceOutput) {
+    sellerPriceOutput.textContent = formatNumber(state.sellerPrice);
   }
 
-  .simulator-layout {
-    grid-template-columns: 1fr;
+  if (quantityOutput) {
+    quantityOutput.textContent = formatNumber(state.quantity);
   }
 
-  .indicator-grid {
-    grid-template-columns: repeat(2, 1fr);
+  updateMarketExplanation(state);
+  drawMarketChart(state);
+}
+
+function updateMarketExplanation(state) {
+  if (!marketExplanation) return;
+
+  let message = "";
+
+  if (state.tax > 0) {
+    message =
+      `A per-unit tax of ${state.tax} creates a wedge between the price paid by buyers (${formatNumber(state.buyerPrice)}) and the price received by sellers (${formatNumber(state.sellerPrice)}). Equilibrium quantity falls relative to the no-tax equilibrium.`;
+  } else if (state.demandIntensity > 55) {
+    message =
+      "Demand is relatively strong. In this model, the equilibrium price and quantity rise as demand increases, holding supply conditions constant.";
+  } else if (state.demandIntensity < 45) {
+    message =
+      "Demand is relatively weak. The market adjusts toward a lower equilibrium price and quantity, holding supply conditions constant.";
+  } else if (state.supplyIntensity > 55) {
+    message =
+      "Supply is relatively strong. More goods are available at each price, putting downward pressure on equilibrium price and increasing equilibrium quantity.";
+  } else if (state.supplyIntensity < 45) {
+    message =
+      "Supply is relatively constrained. Equilibrium price tends to rise while equilibrium quantity falls.";
+  } else {
+    message =
+      "The market is close to its baseline conditions. Change demand, supply or tax to see how equilibrium responds.";
   }
 
-  .cross-level-inner {
-    gap: 35px;
+  marketExplanation.textContent = message;
+}
+
+/* Canvas graph */
+
+function drawMarketChart(state) {
+  if (!marketCanvas) return;
+
+  const rect = marketCanvas.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) return;
+
+  const ctx = marketCanvas.getContext("2d");
+  if (!ctx) return;
+
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  marketCanvas.width = Math.round(rect.width * dpr);
+  marketCanvas.height = Math.round(rect.height * dpr);
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const width = rect.width;
+  const height = rect.height;
+
+  const margin = {
+    left: 42,
+    right: 17,
+    top: 18,
+    bottom: 37
+  };
+
+  const plotWidth = width - margin.left - margin.right;
+  const plotHeight = height - margin.top - margin.bottom;
+
+  const x = quantity => margin.left + (quantity / 100) * plotWidth;
+  const y = price => margin.top + (1 - price / 100) * plotHeight;
+
+  ctx.clearRect(0, 0, width, height);
+
+  // Background grid
+  ctx.strokeStyle = "#3a4c40";
+  ctx.lineWidth = 1;
+
+  for (let i = 0; i <= 5; i++) {
+    const gx = margin.left + (plotWidth / 5) * i;
+    const gy = margin.top + (plotHeight / 5) * i;
+
+    ctx.beginPath();
+    ctx.moveTo(gx, margin.top);
+    ctx.lineTo(gx, height - margin.bottom);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(margin.left, gy);
+    ctx.lineTo(width - margin.right, gy);
+    ctx.stroke();
   }
 
-  .main-nav {
-    gap: 17px;
+  // Axis labels
+  ctx.fillStyle = "#a1b2a4";
+  ctx.font = "9px monospace";
+  ctx.textAlign = "center";
+
+  for (let i = 0; i <= 5; i++) {
+    const value = i * 20;
+
+    ctx.fillText(
+      String(value),
+      x(value),
+      height - 16
+    );
+
+    ctx.textAlign = "right";
+
+    ctx.fillText(
+      String(100 - value),
+      margin.left - 8,
+      y(100 - value) + 3
+    );
+
+    ctx.textAlign = "center";
   }
 
-  .main-nav > a {
-    font-size: 10px;
+  // Axes
+  ctx.strokeStyle = "#8b9c8d";
+  ctx.lineWidth = 1.4;
+
+  ctx.beginPath();
+  ctx.moveTo(margin.left, margin.top);
+  ctx.lineTo(margin.left, height - margin.bottom);
+  ctx.lineTo(width - margin.right, height - margin.bottom);
+  ctx.stroke();
+
+  // Demand curve: P = A - Q
+  ctx.strokeStyle = "#b9f36b";
+  ctx.lineWidth = 2.7;
+
+  ctx.beginPath();
+
+  let started = false;
+
+  for (let q = 0; q <= 100; q += 1) {
+    const p = state.demandIntercept - q;
+
+    if (p < 0 || p > 100) continue;
+
+    if (!started) {
+      ctx.moveTo(x(q), y(p));
+      started = true;
+    } else {
+      ctx.lineTo(x(q), y(p));
+    }
+  }
+
+  ctx.stroke();
+
+  // Supply curve: Ps = C + Q
+  ctx.strokeStyle = "#91abc8";
+  ctx.lineWidth = 2.7;
+  ctx.beginPath();
+
+  started = false;
+
+  for (let q = 0; q <= 100; q += 1) {
+    const p = state.supplyIntercept + q;
+
+    if (p < 0 || p > 100) continue;
+
+    if (!started) {
+      ctx.moveTo(x(q), y(p));
+      started = true;
+    } else {
+      ctx.lineTo(x(q), y(p));
+    }
+  }
+
+  ctx.stroke();
+
+  // Tax-inclusive supply curve: Pb = C + Q + T
+  if (state.tax > 0) {
+    ctx.strokeStyle = "#e7b77b";
+    ctx.lineWidth = 1.7;
+    ctx.setLineDash([5, 4]);
+
+    ctx.beginPath();
+
+    started = false;
+
+    for (let q = 0; q <= 100; q += 1) {
+      const p = state.supplyIntercept + q + state.tax;
+
+      if (p < 0 || p > 100) continue;
+
+      if (!started) {
+        ctx.moveTo(x(q), y(p));
+        started = true;
+      } else {
+        ctx.lineTo(x(q), y(p));
+      }
+    }
+
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Equilibrium guide lines
+  const eqX = x(state.quantity);
+  const buyerY = y(state.buyerPrice);
+  const sellerY = y(state.sellerPrice);
+
+  ctx.strokeStyle = "#d4e4cb";
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+
+  ctx.beginPath();
+  ctx.moveTo(eqX, buyerY);
+  ctx.lineTo(eqX, height - margin.bottom);
+  ctx.stroke();
+
+  if (state.tax > 0) {
+    ctx.beginPath();
+    ctx.moveTo(margin.left, buyerY);
+    ctx.lineTo(eqX, buyerY);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(margin.left, sellerY);
+    ctx.lineTo(eqX, sellerY);
+    ctx.stroke();
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(margin.left, buyerY);
+    ctx.lineTo(eqX, buyerY);
+    ctx.stroke();
+  }
+
+  ctx.setLineDash([]);
+
+  // Buyer equilibrium point
+  ctx.beginPath();
+  ctx.arc(eqX, buyerY, 5.5, 0, Math.PI * 2);
+  ctx.fillStyle = "#b9f36b";
+  ctx.fill();
+
+  ctx.strokeStyle = "#17251e";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Seller equilibrium point when tax is present
+  if (state.tax > 0) {
+    ctx.beginPath();
+    ctx.arc(eqX, sellerY, 4.5, 0, Math.PI * 2);
+    ctx.fillStyle = "#e7b77b";
+    ctx.fill();
+  }
+
+  // Axis titles
+  ctx.fillStyle = "#a1b2a4";
+  ctx.font = "9px monospace";
+  ctx.textAlign = "left";
+  ctx.fillText("PRICE", margin.left, 10);
+
+  ctx.textAlign = "right";
+  ctx.fillText("QUANTITY", width - margin.right, height - 3);
+
+  // Curve labels
+  ctx.font = "10px monospace";
+  ctx.textAlign = "right";
+  ctx.fillStyle = "#b9f36b";
+  ctx.fillText("D", width - margin.right - 5, y(Math.max(8, state.demandIntercept - 10)));
+
+  ctx.fillStyle = "#91abc8";
+  ctx.fillText("S", width - margin.right - 5, y(Math.min(90, state.supplyIntercept + 80)));
+
+  if (state.tax > 0) {
+    ctx.fillStyle = "#e7b77b";
+    ctx.fillText("S + TAX", width - margin.right - 5, y(Math.min(95, state.supplyIntercept + state.tax + 80)));
   }
 }
 
-@media (max-width: 680px) {
-  .section-wrap {
-    width: calc(100% - 38px);
-  }
+[demandSlider, supplySlider, taxSlider].forEach(slider => {
+  if (slider) slider.addEventListener("input", updateMarket);
+});
 
-  .section {
-    padding-block: 76px;
-  }
+const resetMarket = $("#resetMarket");
 
-  .site-header {
-    height: 68px;
-    padding-inline: 19px;
-  }
-
-  .menu-toggle {
-    display: block;
-  }
-
-  .main-nav {
-    display: none;
-    position: absolute;
-    top: 67px;
-    left: 0;
-    right: 0;
-    background: #f5f6f0;
-    border-bottom: 1px solid #dce5d8;
-    padding: 17px 20px 23px;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0;
-  }
-
-  .main-nav.open {
-    display: flex;
-  }
-
-  .main-nav > a {
-    padding: 13px 3px;
-    font-size: 12px;
-    border-bottom: 1px solid #e6ebe3;
-  }
-
-  .main-nav .nav-cta {
-    margin-top: 12px;
-    text-align: center;
-    border: 0;
-    padding: 13px;
-  }
-
-  .hero {
-    min-height: auto;
-    padding-top: 68px;
-    padding-bottom: 70px;
-  }
-
-  .hero h1 {
-    font-size: clamp(40px, 11vw, 58px);
-    letter-spacing: -2.5px;
-  }
-
-  .hero-description {
-    font-size: 12px;
-  }
-
-  .hero-note {
-    margin-top: 36px;
-  }
-
-  .hero-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .intro-inner {
-    flex-direction: column;
-    align-items: start;
-    justify-content: center;
-    padding-block: 19px;
-  }
-
-  .intro-levels {
-    gap: 21px;
-  }
-
-  .intro-levels span {
-    font-size: 9px;
-  }
-
-  .section-heading {
-    flex-direction: column;
-    align-items: start;
-    gap: 15px;
-    margin-bottom: 30px;
-  }
-
-  .section-heading h2 {
-    font-size: 38px;
-  }
-
-  .lab-grid, .calculator-grid, .topic-groups {
-    grid-template-columns: 1fr;
-  }
-
-  .lab-card > p {
-    min-height: auto;
-  }
-
-  .sim-controls, .sim-chart-panel, .calculator-card {
-    padding: 18px;
-  }
-
-  .market-chart-wrap {
-    height: 235px;
-  }
-
-  .equilibrium-results strong {
-    font-size: 16px;
-  }
-
-  .equilibrium-results span {
-    font-size: 7px;
-  }
-
-  .observatory-header {
-    align-items: start;
-  }
-
-  .observatory-mark {
-    width: 65px;
-    height: 65px;
-    font-size: 12px;
-  }
-
-  .indicator-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .indicator-card {
-    padding: 15px;
-  }
-
-  .indicator-card p {
-    min-height: 110px;
-  }
-
-  .observatory-disclaimer {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .cross-level-inner, .about-section {
-    grid-template-columns: 1fr;
-    gap: 35px;
-  }
-
-  .cross-level-section {
-    padding-block: 75px;
-  }
-
-  .footer-inner {
-    flex-wrap: wrap;
-  }
-
-  .footer-inner > p {
-    order: 3;
-    width: 100%;
-  }
-
-  .footer-bottom {
-    flex-direction: column;
-  }
-
-  .ecobot-launcher {
-    right: 15px;
-    bottom: 15px;
-  }
-
-  .ecobot-window {
-    right: 10px;
-    bottom: 80px;
-    width: calc(100vw - 20px);
-    height: min(570px, calc(100dvh - 100px));
-  }
+if (resetMarket) {
+  resetMarket.addEventListener("click", () => {
+    demandSlider.value = 50;
+    supplySlider.value = 50;
+    taxSlider.value = 0;
+    updateMarket();
+  });
 }
 
-@media (max-width: 380px) {
-  .section-wrap {
-    width: calc(100% - 28px);
-  }
+window.addEventListener("resize", () => {
+  if (marketState) drawMarketChart(marketState);
+});
 
-  .two-columns {
-    grid-template-columns: 1fr;
-  }
+updateMarket();
 
-  .indicator-grid {
-    grid-template-columns: 1fr;
-  }
+/* =====================================================
+   4. PRICE ELASTICITY CALCULATOR
+===================================================== */
 
-  .indicator-card p {
-    min-height: auto;
-  }
+const elasticityButton = $("#calculateElasticity");
 
-  .visual-bottom {
-    flex-wrap: wrap;
-  }
+if (elasticityButton) {
+  elasticityButton.addEventListener("click", () => {
+    const p1 = readNumber("p1");
+    const p2 = readNumber("p2");
+    const q1 = readNumber("q1");
+    const q2 = readNumber("q2");
 
-  .visual-bottom > div {
-    min-width: 40%;
-  }
+    if (![p1, p2, q1, q2].every(Number.isFinite)) {
+      showResult("elasticityResult", "Please enter valid numbers in all fields.", true);
+      return;
+    }
+
+    if (p1 <= 0 || p2 <= 0 || q1 <= 0 || q2 <= 0) {
+      showResult("elasticityResult", "Prices and quantities must be greater than zero.", true);
+      return;
+    }
+
+    const averageQuantity = (q1 + q2) / 2;
+    const averagePrice = (p1 + p2) / 2;
+
+    const percentageQuantity = (q2 - q1) / averageQuantity;
+    const percentagePrice = (p2 - p1) / averagePrice;
+
+    if (percentagePrice === 0) {
+      showResult("elasticityResult", "Price did not change. Elasticity cannot be calculated with this input.", true);
+      return;
+    }
+
+    const ped = percentageQuantity / percentagePrice;
+    const absolutePED = Math.abs(ped);
+
+    let interpretation;
+
+    if (Math.abs(absolutePED - 1) < 0.000001) {
+      interpretation = "Unit elastic demand";
+    } else if (absolutePED > 1) {
+      interpretation = "Elastic demand";
+    } else {
+      interpretation = "Inelastic demand";
+    }
+
+    const result =
+      `PRICE ELASTICITY OF DEMAND\n\n` +
+      `Percentage change in quantity: ${formatNumber(percentageQuantity * 100)}%\n` +
+      `Percentage change in price: ${formatNumber(percentagePrice * 100)}%\n\n` +
+      `PED = ${formatNumber(ped, 4)}\n` +
+      `Absolute PED = ${formatNumber(absolutePED, 4)}\n\n` +
+      `Interpretation: ${interpretation}.\n\n` +
+      `The absolute value tells us how responsive quantity demanded is to a price change.`;
+
+    showResult("elasticityResult", result);
+  });
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    scroll-behavior: auto !important;
-    animation-duration: .01ms !important;
-    transition-duration: .01ms !important;
-  }
+/* =====================================================
+   5. GDP CALCULATOR
+===================================================== */
+
+const gdpButton = $("#calculateGDP");
+
+if (gdpButton) {
+  gdpButton.addEventListener("click", () => {
+    const C = readNumber("gdpC");
+    const I = readNumber("gdpI");
+    const G = readNumber("gdpG");
+    const X = readNumber("gdpX");
+    const M = readNumber("gdpM");
+
+    if (![C, I, G, X, M].every(Number.isFinite)) {
+      showResult("gdpResult", "Please complete all five fields with valid numbers.", true);
+      return;
+    }
+
+    const netExports = X - M;
+    const gdp = C + I + G + netExports;
+
+    const result =
+      `GDP EXPENDITURE APPROACH\n\n` +
+      `Consumption: ${formatNumber(C)}\n` +
+      `Investment: ${formatNumber(I)}\n` +
+      `Government purchases: ${formatNumber(G)}\n` +
+      `Exports: ${formatNumber(X)}\n` +
+      `Imports: ${formatNumber(M)}\n\n` +
+      `Net exports = X − M = ${formatNumber(netExports)}\n\n` +
+      `GDP = C + I + G + (X − M)\n` +
+      `GDP = ${formatNumber(gdp)} monetary units.`;
+
+    showResult("gdpResult", result);
+  });
 }
 
+/* =====================================================
+   6. HERFINDAHL-HIRSCHMAN INDEX CALCULATOR
+===================================================== */
+
+const hhiButton = $("#calculateHHI");
+
+if (hhiButton) {
+  hhiButton.addEventListener("click", () => {
+    const raw = $("#hhiShares")?.value ?? "";
+
+    const shares = raw
+      .split(/[\s,;]+/)
+      .filter(value => value.length > 0)
+      .map(Number);
+
+    if (
+      shares.length < 2 ||
+      shares.some(value => !Number.isFinite(value) || value < 0 || value > 100)
+    ) {
+      showResult("hhiResult", "Enter at least two valid market shares between 0 and 100.", true);
+      return;
+    }
+
+    const totalShare = shares.reduce((sum, value) => sum + value, 0);
+
+    if (Math.abs(totalShare - 100) > 0.01) {
+      showResult(
+        "hhiResult",
+        `Your market shares total ${formatNumber(totalShare)}%, not 100%. Please correct the entries.`,
+        true
+      );
+      return;
+    }
+
+    const hhi = shares.reduce((sum, value) => sum + value ** 2, 0);
+
+    let interpretation;
+
+    if (hhi < 1500) {
+      interpretation = "Relatively low concentration under one commonly used US screening framework.";
+    } else if (hhi < 2500) {
+      interpretation = "Moderate concentration under one commonly used US screening framework.";
+    } else {
+      interpretation = "High concentration under one commonly used US screening framework.";
+    }
+
+    const result =
+      `MARKET CONCENTRATION\n\n` +
+      `Market shares: ${shares.join("%, ")}%\n\n` +
+      `HHI = ${shares.map(value => `${value}²`).join(" + ")}\n` +
+      `HHI = ${formatNumber(hhi, 0)}\n\n` +
+      `${interpretation}\n\n` +
+      `Note: Regulatory thresholds vary by jurisdiction and framework.`;
+
+    showResult("hhiResult", result);
+  });
+}
+
+/* =====================================================
+   7. DESCRIPTIVE STATISTICS
+===================================================== */
+
+function medianOf(sortedValues) {
+  const n = sortedValues.length;
+  const middle = Math.floor(n / 2);
+
+  if (n % 2 === 1) {
+    return sortedValues[middle];
+  }
+
+  return (sortedValues[middle - 1] + sortedValues[middle]) / 2;
+}
+
+function modesOf(values) {
+  const frequency = new Map();
+
+  values.forEach(value => {
+    frequency.set(value, (frequency.get(value) || 0) + 1);
+  });
+
+  const maxFrequency = Math.max(...frequency.values());
+
+  if (maxFrequency === 1) return [];
+
+  return [...frequency.entries()]
+    .filter(([, count]) => count === maxFrequency)
+    .map(([value]) => value)
+    .sort((a, b) => a - b);
+}
+
+function quartilesOf(sortedValues) {
+  const n = sortedValues.length;
+
+  if (n === 1) {
+    return {
+      q1: sortedValues[0],
+      q3: sortedValues[0]
+    };
+  }
+
+  const middle = Math.floor(n / 2);
+
+  const lowerHalf = sortedValues.slice(0, middle);
+  const upperHalf = sortedValues.slice(Math.ceil(n / 2));
+
+  return {
+    q1: medianOf(lowerHalf),
+    q3: medianOf(upperHalf)
+  };
+}
+
+const statsButton = $("#calculateStats");
+
+if (statsButton) {
+  statsButton.addEventListener("click", () => {
+    const raw = $("#statsData")?.value ?? "";
+
+    const values = raw
+      .split(/[\s,;]+/)
+      .filter(value => value.length > 0)
+      .map(Number);
+
+    if (
+      values.length === 0 ||
+      values.some(value => !Number.isFinite(value))
+    ) {
+      showResult("statsResult", "Please enter a valid numerical dataset.", true);
+      return;
+    }
+
+    const sorted = [...values].sort((a, b) => a - b);
+    const n = sorted.length;
+
+    const sum = values.reduce((total, value) => total + value, 0);
+    const mean = sum / n;
+    const median = medianOf(sorted);
+    const modes = modesOf(values);
+
+    const minimum = sorted[0];
+    const maximum = sorted[n - 1];
+    const range = maximum - minimum;
+
+    const { q1, q3 } = quartilesOf(sorted);
+    const iqr = q3 - q1;
+
+    const result =
+      `DESCRIPTIVE STATISTICS\n\n` +
+      `Observations: ${n}\n` +
+      `Sum: ${formatNumber(sum)}\n` +
+      `Mean: ${formatNumber(mean)}\n` +
+      `Median: ${formatNumber(median)}\n` +
+      `Mode: ${modes.length ? modes.map(formatNumber).join(", ") : "No mode"}\n\n` +
+      `Minimum: ${formatNumber(minimum)}\n` +
+      `Maximum: ${formatNumber(maximum)}\n` +
+      `Range: ${formatNumber(range)}\n\n` +
+      `First quartile (Q1): ${formatNumber(q1)}\n` +
+      `Third quartile (Q3): ${formatNumber(q3)}\n` +
+      `Interquartile range: ${formatNumber(iqr)}\n\n` +
+      `Method: Median of the lower and upper halves.`;
+
+    showResult("statsResult", result);
+  });
+}
+
+/* =====================================================
+   8. ÉCOBOT — ECONOMICS TUTOR
+===================================================== */
+
+const launcher = $("#ecobotLauncher");
+const chatWindow = $("#ecobotWindow");
+const closeChatButton = $("#ecobotClose");
+const chatForm = $("#ecobotForm");
+const chatInput = $("#ecobotInput");
+const chatMessages = $("#ecobotMessages");
+const chatDomain = $("#ecobotDomain");
+
+function openEcoBot() {
+  if (!chatWindow || !launcher) return;
+
+  chatWindow.hidden = false;
+  launcher.setAttribute("aria-expanded", "true");
+
+  if (chatInput) chatInput.focus();
+}
+
+function closeEcoBot() {
+  if (!chatWindow || !launcher) return;
+
+  chatWindow.hidden = true;
+  launcher.setAttribute("aria-expanded", "false");
+  launcher.focus();
+}
+
+if (launcher) {
+  launcher.addEventListener("click", () => {
+    if (chatWindow.hidden) {
+      openEcoBot();
+    } else {
+      closeEcoBot();
+    }
+  });
+}
+
+if (closeChatButton) {
+  closeChatButton.addEventListener("click", closeEcoBot);
+}
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && chatWindow && !chatWindow.hidden) {
+    closeEcoBot();
+  }
+});
+
+/* -----------------------------------------------------
+   ÉcoBot educational knowledge
+----------------------------------------------------- */
+
+const ecoKnowledge = {
+
+  scarcity: `SCARCITY AND ECONOMIC CHOICE
+
+Scarcity is the fundamental economic problem: resources
+are limited while human wants are numerous.
+
+Because resources are scarce, individuals, businesses
+and governments must make choices.
+
+These choices involve trade-offs.
+
+Example:
+A government has a limited budget. Spending more on
+healthcare may mean allocating less to another priority.
+
+Economics studies how these choices are made.`,
+
+  opportunity: `OPPORTUNITY COST
+
+Opportunity cost is the value of the next-best
+alternative sacrificed when making a choice.
+
+Example:
+You have 100 MAD and can either buy a book or go
+to the cinema.
+
+If you choose the book, the opportunity cost is
+the value of the cinema experience you gave up.
+
+Remember: opportunity cost is not necessarily
+a monetary cost.`,
+
+  supply: `SUPPLY AND DEMAND
+
+Demand represents the quantity consumers are willing
+and able to purchase at different prices.
+
+Supply represents the quantity producers are willing
+and able to sell at different prices.
+
+In the standard competitive market model:
+
+• An increase in demand raises equilibrium price
+  and quantity, holding supply constant.
+• An increase in supply lowers equilibrium price
+  and raises equilibrium quantity, holding demand constant.
+
+The intersection of the two curves is market equilibrium.`,
+
+  elasticity: `PRICE ELASTICITY OF DEMAND
+
+Price elasticity measures how responsive quantity
+demanded is to a change in price.
+
+PED = % change in quantity demanded
+      / % change in price
+
+The midpoint formula is:
+
+PED = [(Q2 − Q1) / ((Q2 + Q1) / 2)]
+      / [(P2 − P1) / ((P2 + P1) / 2)]
+
+Interpretation:
+
+• |PED| > 1: Elastic demand
+• |PED| < 1: Inelastic demand
+• |PED| = 1: Unit elastic demand
+
+Demand usually has a negative price elasticity because
+price and quantity demanded generally move in opposite
+directions.`,
+
+  gdp: `GROSS DOMESTIC PRODUCT (GDP)
+
+GDP measures the market value of final goods and
+services produced within a country's borders during
+a given period.
+
+Expenditure approach:
+
+GDP = C + I + G + (X − M)
+
+Where:
+
+C = Household consumption
+I = Investment
+G = Government purchases
+X = Exports
+M = Imports
+
+Example:
+
+C = 500
+I = 150
+G = 200
+X = 120
+M = 90
+
+GDP = 500 + 150 + 200 + (120 − 90)
+GDP = 880 monetary units.
+
+Imports are subtracted because they are included in
+some of the other expenditure categories but are not
+domestic production.`,
+
+  inflation: `INFLATION
+
+Inflation is a sustained increase in the general price
+level of goods and services.
+
+A common measure is the percentage change in the
+Consumer Price Index (CPI).
+
+Inflation rate =
+[(New CPI − Old CPI) / Old CPI] × 100
+
+Example:
+
+Previous CPI = 100
+Current CPI = 105
+
+Inflation = [(105 − 100) / 100] × 100
+Inflation = 5%
+
+When prices rise, the purchasing power of money
+generally declines.`,
+
+  unemployment: `UNEMPLOYMENT
+
+The unemployment rate measures the percentage of the
+labour force that is unemployed and actively seeking work.
+
+Unemployment rate =
+(Unemployed people / Labour force) × 100
+
+The labour force includes employed people and
+unemployed people who meet the relevant criteria
+for active job search and availability.
+
+It does not include every person who is not working.`,
+
+  micro: `MICROECONOMICS
+
+Microeconomics studies individual economic agents
+and their interactions.
+
+Main topics include:
+
+• Consumer choice and utility
+• Supply and demand
+• Price elasticity
+• Production theory
+• Costs, revenues and profit
+• Market structures
+• Opportunity cost
+• Marginal analysis
+
+Its central question is how individuals and firms
+make decisions under resource constraints.`,
+
+  meso: `MESOECONOMICS
+
+Mesoeconomics examines the intermediate level between
+individual economic agents and the national economy.
+
+It focuses on sectors, industries, regional systems
+and networks of businesses.
+
+Key concepts:
+
+• Industrial clusters
+• Value chains
+• Sector productivity
+• Market concentration
+• Regional development
+• Supply chains
+• Industrial organization
+
+Example:
+An increase in automotive production can influence
+component suppliers, logistics companies, employment
+and investment across an industrial ecosystem.`,
+
+  macro: `MACROECONOMICS
+
+Macroeconomics studies the economy as a whole.
+
+Its main topics include:
+
+• GDP and national income
+• Economic growth
+• Inflation
+• Unemployment
+• Fiscal policy
+• Monetary policy
+• International trade
+• Aggregate demand and aggregate supply
+
+It examines national economic indicators and how
+economic policies influence them.`,
+
+  mean: `ARITHMETIC MEAN
+
+The arithmetic mean is calculated by dividing the
+sum of observations by the number of observations.
+
+Mean = Sum of observations / Number of observations
+
+Example:
+
+Dataset: 10, 20, 30
+
+Mean = (10 + 20 + 30) / 3
+Mean = 20
+
+The mean is sensitive to extreme values.`,
+
+  median: `MEDIAN
+
+The median is the central value of an ordered dataset.
+
+If the number of observations is odd, the median is
+the middle observation.
+
+If it is even, the median is the average of the
+two central observations.
+
+Example:
+
+3, 5, 8, 10, 12
+
+Median = 8
+
+The median is less sensitive to extreme values
+than the arithmetic mean.`,
+
+  statistics: `DESCRIPTIVE STATISTICS
+
+Descriptive statistics summarize and describe data.
+
+Measures of central tendency:
+
+• Mean
+• Median
+• Mode
+
+Measures of position:
+
+• Quartiles
+• Quintiles
+• Deciles
+• Percentiles
+
+Measures of dispersion:
+
+• Range
+• Interquartile range
+• Variance
+• Standard deviation
+
+These tools help us understand the distribution
+and characteristics of a dataset.`,
+
+  hhi: `HERFINDAHL-HIRSCHMAN INDEX (HHI)
+
+The HHI measures market concentration.
+
+Formula:
+
+HHI = Sum of squared market shares.
+
+Example:
+
+Market shares: 40%, 30%, 20%, 10%
+
+HHI = 40² + 30² + 20² + 10²
+HHI = 1,600 + 900 + 400 + 100
+HHI = 3,000
+
+The higher the index, the more concentrated the market.
+
+Regulatory thresholds differ across jurisdictions.`,
+
+  monopoly: `MARKET STRUCTURES
+
+Perfect competition:
+Many firms, homogeneous products and relatively
+free entry and exit.
+
+Monopoly:
+A single firm supplies the market, with significant
+barriers to entry.
+
+Oligopoly:
+A small number of firms interact strategically.
+
+Monopolistic competition:
+Many firms sell differentiated products.
+
+The structure of a market influences pricing,
+production and competition.`,
+
+  production: `PRODUCTION AND COSTS
+
+Production transforms inputs into outputs.
+
+Common cost concepts include:
+
+Fixed costs:
+Costs that do not vary with output in the short run.
+
+Variable costs:
+Costs that change with the level of production.
+
+Total cost:
+TC = FC + VC
+
+Average cost:
+AC = TC / Q
+
+Marginal cost:
+MC = Change in total cost / Change in output
+
+Marginal analysis helps firms decide how much to produce.`,
+
+  valuechain: `VALUE CHAINS
+
+A value chain describes the sequence of activities
+through which a product or service gains value.
+
+Example: Automotive industry
+
+1. Raw material extraction
+2. Component manufacturing
+3. Assembly
+4. Distribution
+5. Marketing and sales
+6. After-sales services
+
+Mesoeconomic analysis examines how firms, sectors
+and institutions interact throughout these stages.`,
+
+  clusters: `INDUSTRIAL CLUSTERS
+
+An industrial cluster is a geographic concentration
+of interconnected firms, suppliers, service providers
+and institutions in a particular field.
+
+Clusters can facilitate:
+
+• Knowledge sharing
+• Specialized labour markets
+• Supplier networks
+• Innovation
+• Productivity gains
+
+They are an important topic in regional and
+mesoeconomic analysis.`,
+
+  monetary: `MONETARY POLICY
+
+Monetary policy refers to actions taken by a central
+bank to influence monetary and financial conditions.
+
+Common instruments include:
+
+• Policy interest rates
+• Open market operations
+• Reserve requirements, where applicable
+
+A change in interest rates can influence borrowing,
+saving, investment, consumption and inflation.
+
+The exact transmission mechanism depends on the
+economic and institutional context.`,
+
+  fiscal: `FISCAL POLICY
+
+Fiscal policy concerns government spending,
+taxation and borrowing.
+
+Expansionary fiscal policy can involve:
+
+• Increasing government expenditure
+• Reducing taxes
+
+Contractionary fiscal policy can involve:
+
+• Reducing government expenditure
+• Increasing taxes
+
+Its effects depend on economic conditions,
+financing, timing and the structure of the economy.`,
+
+  growth: `ECONOMIC GROWTH
+
+Economic growth refers to an increase in the
+production of goods and services over time.
+
+It is often measured by the percentage change
+in real GDP.
+
+Real GDP growth =
+[(Current real GDP − Previous real GDP)
+ / Previous real GDP] × 100
+
+Growth can be influenced by productivity,
+capital accumulation, labour, technology
+and institutions.`,
+
+  trade: `INTERNATIONAL TRADE
+
+International trade is the exchange of goods
+and services across national borders.
+
+Exports are goods and services sold abroad.
+Imports are goods and services purchased abroad.
+
+Net exports = Exports − Imports
+
+In the expenditure approach to GDP, net exports
+are included as part of aggregate expenditure.
+
+Trade can create gains from specialization,
+but its effects are distributed unevenly.`,
+
+  utility: `UTILITY AND CONSUMER CHOICE
+
+Utility represents the satisfaction or benefit
+a consumer obtains from consuming goods or services.
+
+Consumer theory studies how people allocate limited
+income among different alternatives.
+
+The budget constraint describes the combinations
+of goods a consumer can afford.
+
+Consumer choice depends on preferences,
+prices and available income.`,
+
+  marginal: `MARGINAL ANALYSIS
+
+Marginal analysis examines the additional benefit
+and additional cost of one more unit of an activity.
+
+Marginal benefit (MB):
+The additional benefit from one more unit.
+
+Marginal cost (MC):
+The additional cost from one more unit.
+
+A common decision rule is to continue an activity
+while marginal benefit exceeds marginal cost.
+
+In a simple interior optimum:
+MB = MC.`,
+
+  freeRider: `THE FREE-RIDER PROBLEM
+
+A free rider benefits from a good or service without
+contributing adequately to its provision.
+
+This problem is especially relevant to public goods,
+which are non-excludable and non-rival in consumption.
+
+Example:
+People may benefit from street lighting even if
+they do not directly pay for it.
+
+The free-rider problem can lead to under-provision
+of public goods by private markets.`
+};
+
+/* -----------------------------------------------------
+   ÉcoBot question matching
+----------------------------------------------------- */
+
+function getSelectedDomain() {
+  return chatDomain?.value || "general";
+}
+
+function getPageContext() {
+  const hash = window.location.hash.toLowerCase();
+
+  if (hash.includes("micro")) return "micro";
+  if (hash.includes("meso")) return "meso";
+  if (hash.includes("macro")) return "macro";
+  if (hash.includes("calculator")) return "statistics";
+
+  return "general";
+}
+
+function answerEcoBot(question) {
+  const q = question.toLowerCase();
+  const domain = getSelectedDomain();
+
+  // Basic numerical GDP question:
+  // Example: Calculate GDP C=500 I=150 G=200 X=120 M=90
+
+  const gdpMatch = q.match(
+    /(?:calculate|compute|find)\s+gdp[\s\S]*?c\s*=?\s*(-?\d+(?:\.\d+)?)[\s\S]*?i\s*=?\s*(-?\d+(?:\.\d+)?)[\s\S]*?g\s*=?\s*(-?\d+(?:\.\d+)?)[\s\S]*?x\s*=?\s*(-?\d+(?:\.\d+)?)[\s\S]*?m\s*=?\s*(-?\d+(?:\.\d+)?)/
+  );
+
+  if (gdpMatch) {
+    const [, C, I, G, X, M] = gdpMatch.map(Number);
+    const result = C + I + G + X - M;
+
+    return (
+      `LET'S SOLVE THIS STEP BY STEP\n\n` +
+      `1. GDP = C + I + G + (X − M)\n\n` +
+      `2. Substitute the values:\n` +
+      `GDP = ${C} + ${I} + ${G} + (${X} − ${M})\n\n` +
+      `3. Calculate net exports:\n` +
+      `X − M = ${X - M}\n\n` +
+      `4. Final result:\n` +
+      `GDP = ${formatNumber(result)} monetary units.\n\n` +
+      `That's your answer!`
+    );
+  }
+
+  // Greetings
+  if (/^(hi|hello|hey|good morning|good afternoon)\b/.test(q)) {
+    return "Hello! Welcome to ÉcoLab. What would you like to explore today? We can work on microeconomics, mesoeconomics, macroeconomics or statistics.";
+  }
+
+  // Identity
+  if (q.includes("who are you") || q.includes("what can you do")) {
+    return "I'm ÉcoBot, the economics learning assistant of ÉcoLab. I can introduce foundational concepts, explain formulas, walk through selected calculations and help you connect economic ideas to real-world situations. Choose a learning domain above to focus our conversation.";
+  }
+
+  // Explicit concept matching
+  const patterns = [
+    { keys: ["opportunity cost", "trade-off", "trade off"], key: "opportunity" },
+    { keys: ["scarcity", "economic choice"], key: "scarcity" },
+    { keys: ["elasticity", "ped", "price responsive"], key: "elasticity" },
+    { keys: ["supply", "demand", "equilibrium"], key: "supply" },
+    { keys: ["gross domestic product", "gdp"], key: "gdp" },
+    { keys: ["inflation", "consumer price index", "cpi"], key: "inflation" },
+    { keys: ["unemployment", "labour force", "labor force"], key: "unemployment" },
+    { keys: ["mesoeconomics", "meso economics", "industrial cluster", "value chain"], key: "meso" },
+    { keys: ["macroeconomics", "macro economics"], key: "macro" },
+    { keys: ["microeconomics", "micro economics"], key: "micro" },
+    { keys: ["arithmetic mean", "average", "mean"], key: "mean" },
+    { keys: ["median"], key: "median" },
+    { keys: ["quartile", "percentile", "decile", "quintile", "descriptive statistics"], key: "statistics" },
+    { keys: ["herfindahl", "hhi", "market concentration"], key: "hhi" },
+    { keys: ["monopoly", "oligopoly", "perfect competition", "monopolistic competition"], key: "monopoly" },
+    { keys: ["production", "marginal cost", "fixed cost", "variable cost"], key: "production" },
+    { keys: ["industrial cluster", "cluster"], key: "clusters" },
+    { keys: ["value chain", "value chains"], key: "valuechain" },
+    { keys: ["monetary policy", "central bank", "interest rate"], key: "monetary" },
+    { keys: ["fiscal policy", "government spending", "taxation"], key: "fiscal" },
+    { keys: ["economic growth", "real gdp growth"], key: "growth" },
+    { keys: ["international trade", "exports", "imports", "net exports"], key: "trade" },
+    { keys: ["utility", "consumer preferences", "consumer choice"], key: "utility" },
+    { keys: ["marginal analysis", "marginal benefit"], key: "marginal" },
+    { keys: ["free rider", "free-rider", "public good"], key: "freeRider" }
+  ];
+
+  for (const pattern of patterns) {
+    if (pattern.keys.some(keyword => q.includes(keyword))) {
+      return ecoKnowledge[pattern.key];
+    }
+  }
+
+  // Domain-specific fallback
+  if (domain === "micro") {
+    return (
+      "You're exploring MICROECONOMICS.\n\n" +
+      "I can currently help explain:\n" +
+      "• Scarcity and opportunity cost\n" +
+      "• Supply and demand\n" +
+      "• Elasticity\n" +
+      "• Utility and consumer choice\n" +
+      "• Production and costs\n" +
+      "• Market structures\n" +
+      "• Marginal analysis\n\n" +
+      "Try asking about one of these concepts."
+    );
+  }
+
+  if (domain === "meso") {
+    return (
+      "You're exploring MESOECONOMICS.\n\n" +
+      "I can currently help explain:\n" +
+      "• Industrial clusters\n" +
+      "• Value chains\n" +
+      "• Sector productivity\n" +
+      "• Market concentration\n" +
+      "• Regional development\n" +
+      "• Supply chains\n\n" +
+      "Try asking about one of these concepts."
+    );
+  }
+
+  if (domain === "macro") {
+    return (
+      "You're exploring MACROECONOMICS.\n\n" +
+      "I can currently help explain:\n" +
+      "• GDP and national income\n" +
+      "• Inflation\n" +
+      "• Unemployment\n" +
+      "• Economic growth\n" +
+      "• Monetary policy\n" +
+      "• Fiscal policy\n" +
+      "• International trade\n\n" +
+      "Try asking about one of these concepts."
+    );
+  }
+
+  if (domain === "statistics") {
+    return (
+      "You're exploring STATISTICS.\n\n" +
+      "I can currently help explain:\n" +
+      "• Mean, median and mode\n" +
+      "• Quartiles and percentiles\n" +
+      "• Range and interquartile range\n" +
+      "• Descriptive statistics\n\n" +
+      "You can also use the statistics calculator on ÉcoLab."
+    );
+  }
+
+  return (
+    "That's an interesting question!\n\n" +
+    "I currently work with a predefined educational knowledge base, " +
+    "so I may not recognize every question yet.\n\n" +
+    "Try asking me about opportunity cost, supply and demand, " +
+    "elasticity, GDP, inflation, unemployment, industrial clusters, " +
+    "market concentration or descriptive statistics.\n\n" +
+    "You can also select a learning domain above to explore its topics."
+  );
+}
+
+/* -----------------------------------------------------
+   ÉcoBot message rendering
+----------------------------------------------------- */
+
+function addChatMessage(content, sender) {
+  if (!chatMessages) return null;
+
+  const bubble = document.createElement("div");
+
+  bubble.className = sender === "user"
+    ? "user-message"
+    : "bot-message";
+
+  if (sender === "bot") {
+    const label = document.createElement("span");
+    label.className = "message-label";
+    label.textContent = "ÉCOBOT · TUTOR";
+    bubble.appendChild(label);
+  }
+
+  const paragraph = document.createElement("p");
+
+  // textContent prevents user messages from being treated as HTML.
+  paragraph.textContent = escapeText(content);
+
+  bubble.appendChild(paragraph);
+  chatMessages.appendChild(bubble);
+
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  return bubble;
+}
+
+function sendEcoBotMessage(question) {
+  const cleanQuestion = question.trim();
+
+  if (!cleanQuestion || !chatMessages) return;
+
+  addChatMessage(cleanQuestion, "user");
+
+  const typing = document.createElement("div");
+  typing.className = "ecobot-typing";
+  typing.textContent = "ÉcoBot is thinking...";
+
+  chatMessages.appendChild(typing);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  window.setTimeout(() => {
+    const response = answerEcoBot(cleanQuestion);
+
+    typing.remove();
+    addChatMessage(response, "bot");
+  }, 350);
+}
+
+/* -----------------------------------------------------
+   ÉcoBot form
+----------------------------------------------------- */
+
+if (chatForm && chatInput) {
+  chatForm.addEventListener("submit", event => {
+    event.preventDefault();
+
+    const question = chatInput.value.trim();
+
+    if (!question) return;
+
+    sendEcoBotMessage(question);
+    chatInput.value = "";
+    chatInput.focus();
+  });
+}
+
+/* -----------------------------------------------------
+   Suggested questions and topic buttons
+----------------------------------------------------- */
+
+function connectQuestionButtons() {
+  const questionButtons = [
+    ...$$(".suggestion-chip"),
+    ...$$(".topic-item")
+  ];
+
+  questionButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      const question = button.dataset.question;
+
+      if (!question) return;
+
+      openEcoBot();
+      sendEcoBotMessage(question);
+    });
+  });
+}
+
+connectQuestionButtons();
+
+/* =====================================================
+   9. INITIALIZATION
+===================================================== */
+
+document.addEventListener("DOMContentLoaded", () => {
+  updateMarket();
+});
+
+console.log("ÉcoLab initialized successfully.");
+console.log("ÉcoBot educational tutor is ready.");
