@@ -69,6 +69,80 @@ if (yearElement) {
 }
 
 /* =====================================================
+   2b. PAGE POLISH — header state, scroll spy, reveal
+===================================================== */
+
+const siteHeader = $(".site-header");
+
+function updateHeaderShadow() {
+  if (siteHeader) siteHeader.classList.toggle("scrolled", window.scrollY > 8);
+}
+
+window.addEventListener("scroll", updateHeaderShadow, { passive: true });
+updateHeaderShadow();
+
+// Highlight the nav link for the section currently in view.
+const navLinks = $$("#mainNav > a:not(.nav-cta)");
+const navTargets = navLinks
+  .map(link => document.querySelector(link.getAttribute("href")))
+  .filter(Boolean);
+
+if ("IntersectionObserver" in window && navTargets.length) {
+  const visible = new Map();
+
+  const spy = new IntersectionObserver(entries => {
+    entries.forEach(entry => visible.set(entry.target.id, entry.isIntersecting));
+
+    // The first section (in page order) that is in the reading band wins.
+    const current = navTargets.find(section => visible.get(section.id));
+
+    navLinks.forEach(link => {
+      const active = current && link.getAttribute("href") === `#${current.id}`;
+      link.classList.toggle("active", Boolean(active));
+      if (active) link.setAttribute("aria-current", "true");
+      else link.removeAttribute("aria-current");
+    });
+  }, { rootMargin: "-35% 0px -55% 0px" });
+
+  navTargets.forEach(section => spy.observe(section));
+}
+
+// Ease sections in as they enter the viewport.
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+if ("IntersectionObserver" in window && !prefersReducedMotion) {
+  const revealTargets = $$(
+    ".section-heading, .lab-card, .simulator-layout, .calculator-card, " +
+    ".observatory-header, .indicator-card, .topic-group, .cross-level-inner, " +
+    ".quiz-layout, .about-left, .about-right"
+  );
+
+  document.documentElement.classList.add("js-reveal");
+
+  const revealer = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("in-view");
+      observer.unobserve(entry.target);
+    });
+  }, { rootMargin: "0px 0px -8% 0px", threshold: 0.05 });
+
+  revealTargets.forEach((element, index) => {
+    element.classList.add("reveal");
+    // Small stagger for cards that sit side by side.
+    element.style.transitionDelay = `${(index % 3) * 70}ms`;
+    revealer.observe(element);
+  });
+}
+
+// Canvas text uses DM Mono; redraw once the web font is ready.
+if (document.fonts?.ready) {
+  document.fonts.ready.then(() => {
+    if (typeof updateMarket === "function") updateMarket();
+  });
+}
+
+/* =====================================================
    3. MARKET EQUILIBRIUM SIMULATOR
 ===================================================== */
 
@@ -330,7 +404,7 @@ function drawMarketChart(state) {
 
   // Axis labels
   ctx.fillStyle = "#a1b2a4";
-  ctx.font = "9px monospace";
+  ctx.font = '11px "DM Mono", monospace';
   ctx.textAlign = "center";
 
   for (let i = 0; i <= 5; i++) {
@@ -484,7 +558,7 @@ function drawMarketChart(state) {
 
   // Axis titles
   ctx.fillStyle = "#a1b2a4";
-  ctx.font = "9px monospace";
+  ctx.font = '11px "DM Mono", monospace';
   ctx.textAlign = "left";
   ctx.fillText("PRICE", margin.left, 10);
 
@@ -492,7 +566,7 @@ function drawMarketChart(state) {
   ctx.fillText("QUANTITY", width - margin.right, height - 3);
 
   // Curve labels at the end of each line
-  ctx.font = "10px monospace";
+  ctx.font = '12px "DM Mono", monospace';
   ctx.textAlign = "left";
 
   const labelAt = (end, text, color, dy) => {
