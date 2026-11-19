@@ -1,0 +1,260 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Shift supply and demand, change elasticities and add a tax. See consumer surplus, producer surplus, tax revenue and deadweight loss live.">
+  <meta name="theme-color" content="#101b16">
+  <title>Market Simulator — ÉcoLab</title>
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23101b16'/%3E%3Ctext x='32' y='45' font-family='Arial,sans-serif' font-size='38' font-weight='700' text-anchor='middle' fill='%23b9f36b'%3E%C3%89%3C/text%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+
+<body class="page-simulator" id="top">
+
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- NAVIGATION -->
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="ÉcoLab home">
+      <span class="brand-mark">É</span>
+      <span>ÉcoLab<span class="brand-dot">.</span></span>
+    </a>
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav class="main-nav" id="mainNav" aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="simulator.html" class="active" aria-current="page">Simulator</a>
+      <a href="calculators.html">Calculators</a>
+      <a href="learn.html">Library</a>
+      <a href="quiz.html">Quiz</a>
+      <a href="simulator.html" class="nav-cta">Open the lab <span>↗</span></a>
+    </nav>
+  </header>
+
+  <main id="main">
+
+    <!-- PAGE HERO -->
+    <section class="page-hero">
+      <div class="section-wrap page-hero-inner">
+        <div class="page-hero-copy">
+          <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">ÉcoLab</a><span aria-hidden="true">/</span><span aria-current="page">Simulator</span></nav>
+          <div class="eyebrow"><span class="live-dot"></span> EXPERIMENTAL ECONOMICS</div>
+          <h1 class="page-title">Play with the <span>market.</span></h1>
+          <p class="page-intro">Change the conditions of a market and watch equilibrium, surplus and the cost of taxation respond in real time.</p>
+        </div>
+        <div class="page-hero-art" aria-hidden="true">
+          <svg viewBox="0 0 320 220" class="motif">
+            <path class="motif-grid" d="M20 20 V200 H300" />
+            <path class="motif-line motif-a" pathLength="1" d="M40 40 C 120 60, 200 150, 290 180" />
+            <path class="motif-line motif-b" pathLength="1" d="M40 180 C 120 160, 200 70, 290 40" />
+            <circle class="motif-dot" cx="165" cy="110" r="7" />
+          </svg>
+        </div>
+      </div>
+    </section>
+
+<!-- SIMULATOR -->
+    <section class="section simulator-section" id="simulator">
+      <div class="section-wrap">
+        <div class="simulator-layout">
+          <div class="sim-controls">
+            <div class="panel-heading">
+              <div><span class="panel-index">MODEL INPUTS</span><h3>Control the market</h3></div>
+              <button class="reset-button" id="resetMarket">↺ Reset</button>
+            </div>
+
+            <div class="slider-control">
+              <div class="slider-title"><label for="demandSlider">Demand intensity</label><output id="demandValue">50</output></div>
+              <input type="range" id="demandSlider" min="10" max="90" value="50">
+              <div class="range-labels"><span>LOW</span><span>HIGH</span></div>
+            </div>
+
+            <div class="slider-control">
+              <div class="slider-title"><label for="supplySlider">Supply intensity</label><output id="supplyValue">50</output></div>
+              <input type="range" id="supplySlider" min="10" max="90" value="50">
+              <div class="range-labels"><span>LOW</span><span>HIGH</span></div>
+            </div>
+
+            <div class="slider-control">
+              <div class="slider-title"><label for="taxSlider">Per-unit tax</label><output id="taxValue">0</output></div>
+              <input type="range" id="taxSlider" min="0" max="40" value="0">
+              <div class="range-labels"><span>NO TAX</span><span>HIGH TAX</span></div>
+            </div>
+
+            <div class="slider-pair">
+              <div class="slider-control">
+                <div class="slider-title"><label for="demandSlopeSlider">Demand elasticity</label><output id="demandSlopeValue">Medium</output></div>
+                <input type="range" id="demandSlopeSlider" min="1" max="5" step="1" value="3">
+                <div class="range-labels"><span>STEEP</span><span>FLAT</span></div>
+              </div>
+
+              <div class="slider-control">
+                <div class="slider-title"><label for="supplySlopeSlider">Supply elasticity</label><output id="supplySlopeValue">Medium</output></div>
+                <input type="range" id="supplySlopeSlider" min="1" max="5" step="1" value="3">
+                <div class="range-labels"><span>STEEP</span><span>FLAT</span></div>
+              </div>
+            </div>
+
+            <div class="model-explanation" id="marketExplanation" aria-live="polite">
+              <span class="explanation-icon">↗</span>
+              <p>Adjust the variables to explore how demand, supply and taxation influence market equilibrium.</p>
+            </div>
+          </div>
+
+          <div class="sim-chart-panel">
+            <div class="chart-panel-header">
+              <div><span class="panel-index">LIVE VISUALIZATION</span><h3>Market equilibrium</h3></div>
+              <span class="chart-live"><span class="live-dot"></span> LIVE MODEL</span>
+            </div>
+
+            <div class="market-chart-wrap">
+              <canvas id="marketChart" aria-label="Supply and demand market chart" role="img"></canvas>
+            </div>
+
+            <div class="equilibrium-results">
+              <div><span>BUYER PRICE</span><strong id="buyerPrice">50.0</strong></div>
+              <div><span>SELLER PRICE</span><strong id="sellerPrice">50.0</strong></div>
+              <div><span>QUANTITY</span><strong id="equilibriumQuantity">50.0</strong></div>
+            </div>
+            <div class="welfare-results" aria-live="polite">
+              <div><span><i class="swatch swatch-consumer"></i>CONSUMER SURPLUS</span><strong id="consumerSurplus">0</strong></div>
+              <div><span><i class="swatch swatch-producer"></i>PRODUCER SURPLUS</span><strong id="producerSurplus">0</strong></div>
+              <div><span><i class="swatch swatch-revenue"></i>TAX REVENUE</span><strong id="taxRevenue">0</strong></div>
+              <div><span><i class="swatch swatch-deadweight"></i>DEADWEIGHT LOSS</span><strong id="deadweightLoss">0</strong></div>
+            </div>
+
+            <p class="chart-footnote">Illustrative linear market model. Prices and quantities are expressed in model units.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- READING THE CHART -->
+    <section class="section section-wrap guide-section">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow">HOW TO READ IT</div>
+          <h2>What the <span>shapes mean.</span></h2>
+        </div>
+        <p class="section-intro">Every coloured area on the chart is a quantity of welfare you can measure.</p>
+      </div>
+
+      <div class="guide-grid">
+        <article class="guide-card"><i class="swatch swatch-consumer"></i><h3>Consumer surplus</h3><p>The gap between what buyers would have paid and what they actually pay, summed over every unit bought.</p></article>
+        <article class="guide-card"><i class="swatch swatch-producer"></i><h3>Producer surplus</h3><p>The gap between the price sellers receive and the lowest price they would have accepted.</p></article>
+        <article class="guide-card"><i class="swatch swatch-revenue"></i><h3>Tax revenue</h3><p>The tax per unit times the quantity still traded. It moves surplus to the government; it is not lost.</p></article>
+        <article class="guide-card"><i class="swatch swatch-deadweight"></i><h3>Deadweight loss</h3><p>Trades that no longer happen because of the tax. This surplus goes to nobody, so it is the true cost.</p></article>
+      </div>
+
+      <div class="try-list">
+        <span>TRY THIS</span>
+        <ol>
+          <li>Set a tax of 20, then make demand <strong>steep</strong>. Who pays most of the tax now?</li>
+          <li>Keep the tax and make both curves <strong>flat</strong>. What happens to the deadweight loss?</li>
+          <li>Raise the tax until the market shuts down. Where does all the surplus go?</li>
+        </ol>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="section-wrap footer-grid">
+      <div class="footer-about">
+        <a class="brand footer-brand" href="index.html"><span class="brand-mark">É</span><span>ÉcoLab<span class="brand-dot">.</span></span></a>
+        <p>Understand the economy. Change the variables. An interactive laboratory for micro, meso and macroeconomics.</p>
+      </div>
+
+      <nav class="footer-col" aria-label="Laboratory">
+        <span>LABORATORY</span>
+        <a href="simulator.html">Market simulator</a>
+        <a href="calculators.html">Calculators</a>
+        <a href="quiz.html">Knowledge check</a>
+      </nav>
+
+      <nav class="footer-col" aria-label="Library">
+        <span>LIBRARY</span>
+        <a href="learn.html#micro-topics">Microeconomics</a>
+        <a href="learn.html#meso-topics">Mesoeconomics</a>
+        <a href="learn.html#macro-topics">Macroeconomics</a>
+        <a href="learn.html#observatory">Indicators</a>
+      </nav>
+    </div>
+
+    <div class="section-wrap footer-bottom">
+      <span>© <span id="currentYear"></span> ÉcoLab. Educational project.</span>
+      <a href="#top" class="back-top">BACK TO TOP ↑</a>
+    </div>
+  </footer>
+
+  <!-- ÉCOBOT LAUNCHER -->
+  <button class="ecobot-launcher" id="ecobotLauncher"
+    aria-label="Open ÉcoBot" aria-expanded="false" aria-controls="ecobotWindow">
+    <span class="ecobot-launcher-icon">✳</span>
+    <span class="ecobot-launcher-label">Ask ÉcoBot</span>
+  </button>
+
+  <!-- ÉCOBOT CHAT WINDOW -->
+  <section class="ecobot-window" id="ecobotWindow"
+    aria-label="ÉcoBot economics tutor" hidden>
+
+    <header class="ecobot-header">
+      <div class="ecobot-avatar">É</div>
+      <div class="ecobot-identity">
+        <strong>ÉcoBot</strong>
+        <span><i></i> Your economics tutor</span>
+      </div>
+      <button id="ecobotClose" class="ecobot-close" aria-label="Close chatbot">×</button>
+    </header>
+
+    <div class="ecobot-context">
+      <span>LEARNING DOMAIN</span>
+      <select id="ecobotDomain" aria-label="Choose economics domain">
+        <option value="general">General economics</option>
+        <option value="micro">Microeconomics</option>
+        <option value="meso">Mesoeconomics</option>
+        <option value="macro">Macroeconomics</option>
+        <option value="statistics">Statistics</option>
+      </select>
+    </div>
+
+    <div class="ecobot-messages" id="ecobotMessages" aria-live="polite">
+      <div class="bot-message">
+        <span class="message-label">ÉCOBOT · WELCOME</span>
+        <p>Hello! I'm ÉcoBot, your personal economics tutor.</p>
+        <p>Ask me about an economic concept, a formula, a calculation or a real-world phenomenon. Where shall we begin?</p>
+      </div>
+
+      <div class="ecobot-suggestions">
+        <button class="suggestion-chip" data-question="Explain the difference between microeconomics and macroeconomics.">Micro vs Macro</button>
+        <button class="suggestion-chip" data-question="Explain price elasticity of demand with an example.">Price elasticity</button>
+        <button class="suggestion-chip" data-question="Teach me how to calculate GDP.">Calculate GDP</button>
+        <button class="suggestion-chip" data-question="Explain the difference between mean and median.">Statistics</button>
+      </div>
+    </div>
+
+    <form class="ecobot-form" id="ecobotForm">
+      <input type="text" id="ecobotInput"
+        placeholder="Ask an economics question..."
+        autocomplete="off" aria-label="Your question" required>
+      <button type="submit" aria-label="Send message">↑</button>
+    </form>
+
+    <div class="ecobot-footer">ÉCOLAB · LEARN BY UNDERSTANDING</div>
+  </section>
+
+</body>
+</html>

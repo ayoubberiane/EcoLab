@@ -1,7 +1,10 @@
 
 /* =====================================================
-   ÉCOLAB — COMPLETE JAVASCRIPT
-   Navigation · Market simulator · Calculators · ÉcoBot
+   ÉCOLAB — SHARED JAVASCRIPT (all pages)
+   Every feature checks that its elements exist, so this one
+   file serves the home, simulator, calculators, library and
+   quiz pages.
+   Navigation · Live hero · Simulator · Calculators · Quiz · ÉcoBot
 ===================================================== */
 
 "use strict";
@@ -81,32 +84,6 @@ function updateHeaderShadow() {
 window.addEventListener("scroll", updateHeaderShadow, { passive: true });
 updateHeaderShadow();
 
-// Highlight the nav link for the section currently in view.
-const navLinks = $$("#mainNav > a:not(.nav-cta)");
-const navTargets = navLinks
-  .map(link => document.querySelector(link.getAttribute("href")))
-  .filter(Boolean);
-
-if ("IntersectionObserver" in window && navTargets.length) {
-  const visible = new Map();
-
-  const spy = new IntersectionObserver(entries => {
-    entries.forEach(entry => visible.set(entry.target.id, entry.isIntersecting));
-
-    // The first section (in page order) that is in the reading band wins.
-    const current = navTargets.find(section => visible.get(section.id));
-
-    navLinks.forEach(link => {
-      const active = current && link.getAttribute("href") === `#${current.id}`;
-      link.classList.toggle("active", Boolean(active));
-      if (active) link.setAttribute("aria-current", "true");
-      else link.removeAttribute("aria-current");
-    });
-  }, { rootMargin: "-35% 0px -55% 0px" });
-
-  navTargets.forEach(section => spy.observe(section));
-}
-
 // Ease sections in as they enter the viewport.
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -114,7 +91,8 @@ if ("IntersectionObserver" in window && !prefersReducedMotion) {
   const revealTargets = $$(
     ".section-heading, .lab-card, .simulator-layout, .calculator-card, " +
     ".observatory-header, .indicator-card, .topic-group, .cross-level-inner, " +
-    ".quiz-layout, .about-left, .about-right"
+    ".quiz-layout, .about-left, .about-right, .feature-card, .stat-strip, " +
+    ".guide-card, .try-list, .cta-inner, .filter-bar"
   );
 
   document.documentElement.classList.add("js-reveal");
@@ -141,6 +119,165 @@ if (document.fonts?.ready) {
     if (typeof updateMarket === "function") updateMarket();
   });
 }
+
+/* =====================================================
+   2c. HOME — LIVE HERO MARKET, COUNTERS
+===================================================== */
+
+/*
+  The hero chart is a tiny live market: demand and supply drift on
+  slow, out-of-phase cycles and the equilibrium point follows their
+  intersection. It starts after the CSS draw-in animation, pauses when
+  off screen or in a background tab, and never runs under reduced motion.
+*/
+
+const heroSvg = $(".visual-chart svg");
+
+if (heroSvg) {
+  const [demandPath, supplyPath] = heroSvg.querySelectorAll(".hero-curve");
+  const eqDot = heroSvg.querySelector(".hero-eq");
+  const eqLabel = heroSvg.querySelector(".hero-eq-label");
+  const demandLabel = heroSvg.querySelector(".hero-label-d");
+  const supplyLabel = heroSvg.querySelector(".hero-label-s");
+  const guide = heroSvg.querySelector('path[stroke-dasharray]');
+  const readout = $("#heroReadout");
+  const status = $("#heroStatus");
+
+  // Base geometry in SVG units (matches the static markup).
+  const X0 = 75, X1 = 430, SLOPE = 205 / 355;
+  const AXIS_X = 55, AXIS_Y = 300, PLOT_W = 420, PLOT_H = 275;
+
+  let running = false;
+  let visible = true;
+  let start = null;
+
+  function frame(now) {
+    if (!running) return;
+    if (start === null) start = now;
+    const t = (now - start) / 1000;
+
+    // Demand shifts on a ~9s cycle, supply on a ~13s cycle.
+    const dShift = 32 * Math.sin(t * 0.7);
+    const sShift = 24 * Math.sin(t * 0.48 + 1.3);
+
+    demandPath.setAttribute("d", `M${X0} ${65 + dShift} L${X1} ${270 + dShift}`);
+    supplyPath.setAttribute("d", `M${X0} ${270 + sShift} L${X1} ${65 + sShift}`);
+
+    // Intersection of the two lines.
+    const u = (205 + sShift - dShift) / (2 * SLOPE);
+    const ex = X0 + u;
+    const ey = 65 + dShift + SLOPE * u;
+
+    eqDot.setAttribute("cx", ex.toFixed(1));
+    eqDot.setAttribute("cy", ey.toFixed(1));
+    // Label sits to the right of the point; a halo (CSS paint-order) keeps it legible over the lines.
+    eqLabel.setAttribute("x", (ex + 14).toFixed(1));
+    eqLabel.setAttribute("y", (ey + 4).toFixed(1));
+
+    // Curve labels ride along with their lines.
+    if (demandLabel) demandLabel.setAttribute("y", (287 + dShift).toFixed(1));
+    if (supplyLabel) supplyLabel.setAttribute("y", (52 + sShift).toFixed(1));
+    if (guide) guide.setAttribute("d", `M${ex.toFixed(1)} ${ey.toFixed(1)} V300 M55 ${ey.toFixed(1)} H${ex.toFixed(1)}`);
+
+    if (readout) {
+      const price = ((AXIS_Y - ey) / PLOT_H) * 100;
+      const quantity = ((ex - AXIS_X) / PLOT_W) * 100;
+      readout.textContent = `${price.toFixed(1)} · ${quantity.toFixed(1)}`;
+    }
+
+    if (status) {
+      const trend = Math.cos(t * 0.7);
+      status.textContent = trend > 0.3 ? "DEMAND FALLING" : trend < -0.3 ? "DEMAND RISING" : "LIVE MARKET";
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  function setRunning(shouldRun) {
+    if (shouldRun === running) return;
+    running = shouldRun;
+    if (running) requestAnimationFrame(frame);
+  }
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (!reduceMotion && demandPath && supplyPath && eqDot) {
+    // Let the CSS draw-in finish first, then hand over to the live model.
+    window.setTimeout(() => {
+      heroSvg.classList.add("is-live");
+      setRunning(visible && !document.hidden);
+    }, 1900);
+
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        if (heroSvg.classList.contains("is-live")) setRunning(visible && !document.hidden);
+      }).observe(heroSvg);
+    }
+
+    document.addEventListener("visibilitychange", () => {
+      if (heroSvg.classList.contains("is-live")) setRunning(visible && !document.hidden);
+    });
+  }
+}
+
+// Count-up numbers (home stat strip).
+const counters = $$("[data-count]");
+
+if (counters.length && "IntersectionObserver" in window &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  const countObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      observer.unobserve(entry.target);
+
+      const target = Number(entry.target.dataset.count);
+      const duration = 1100;
+      let begin = null;
+
+      const tick = now => {
+        if (begin === null) begin = now;
+        const progress = Math.min(1, (now - begin) / duration);
+        const eased = 1 - (1 - progress) ** 3;
+        entry.target.textContent = Math.round(target * eased);
+        if (progress < 1) requestAnimationFrame(tick);
+      };
+
+      entry.target.textContent = "0";
+      requestAnimationFrame(tick);
+    });
+  }, { threshold: 0.6 });
+
+  counters.forEach(counter => countObserver.observe(counter));
+}
+
+/* =====================================================
+   2d. CALCULATORS — CATEGORY FILTER
+===================================================== */
+
+const filterChips = $$(".filter-chip");
+
+filterChips.forEach(chip => {
+  chip.addEventListener("click", () => {
+    const filter = chip.dataset.filter;
+
+    filterChips.forEach(other => {
+      const active = other === chip;
+      other.classList.toggle("active", active);
+      other.setAttribute("aria-pressed", String(active));
+    });
+
+    $$(".calculator-card[data-category]").forEach(card => {
+      const show = filter === "all" || card.dataset.category === filter;
+      card.hidden = !show;
+      if (show) {
+        card.classList.remove("filter-in");
+        void card.offsetWidth; // restart the entrance animation
+        card.classList.add("filter-in");
+      }
+    });
+  });
+});
 
 /* =====================================================
    3. MARKET EQUILIBRIUM SIMULATOR

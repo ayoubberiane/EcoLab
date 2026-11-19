@@ -18,33 +18,34 @@
   <script src="script.js" defer></script>
 </head>
 
-<body>
+<body class="page-home" id="top">
+
+  <a class="skip-link" href="#main">Skip to content</a>
 
   <!-- NAVIGATION -->
   <header class="site-header">
-    <a class="brand" href="#home" aria-label="ÉcoLab home">
+    <a class="brand" href="index.html" aria-label="ÉcoLab home">
       <span class="brand-mark">É</span>
       <span>ÉcoLab<span class="brand-dot">.</span></span>
     </a>
 
-    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false">
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mainNav">
       <span></span><span></span><span></span>
     </button>
 
-    <nav class="main-nav" id="mainNav">
-      <a href="#laboratories">Laboratories</a>
-      <a href="#simulator">Simulator</a>
-      <a href="#calculators">Calculators</a>
-      <a href="#observatory">Observatory</a>
-      <a href="#quiz">Quiz</a>
-      <a href="#about">About</a>
-      <a href="#laboratories" class="nav-cta">Start learning <span>↗</span></a>
+    <nav class="main-nav" id="mainNav" aria-label="Main">
+      <a href="index.html" class="active" aria-current="page">Home</a>
+      <a href="simulator.html">Simulator</a>
+      <a href="calculators.html">Calculators</a>
+      <a href="learn.html">Library</a>
+      <a href="quiz.html">Quiz</a>
+      <a href="simulator.html" class="nav-cta">Open the lab <span>↗</span></a>
     </nav>
   </header>
 
-  <main>
+  <main id="main">
 
-    <!-- HERO -->
+<!-- HERO -->
     <section class="hero section-wrap" id="home">
       <div class="hero-copy">
         <div class="eyebrow"><span class="live-dot"></span> AN INTERACTIVE ECONOMICS PLATFORM</div>
@@ -59,7 +60,7 @@
 
         <div class="hero-actions">
           <a href="#laboratories" class="button button-primary">Explore the laboratories <span>↗</span></a>
-          <a href="#simulator" class="button button-secondary">Try the simulator <span>→</span></a>
+          <a href="simulator.html" class="button button-secondary">Try the simulator <span>→</span></a>
         </div>
 
         <div class="hero-note">
@@ -89,37 +90,33 @@
             <path class="hero-curve hero-curve-late" d="M75 270 L430 65" fill="none" stroke="#8ca7c5" stroke-width="4" stroke-linecap="round" pathLength="1"/>
             <circle class="hero-eq" cx="252" cy="168" r="7" fill="#b9f36b" stroke="#17251e" stroke-width="3"/>
             <path d="M252 168 V300 M55 168 H252" stroke="#b9f36b" stroke-dasharray="5 5" opacity=".7"/>
-            <text x="380" y="287" fill="#b9f36b" font-size="12" font-family="DM Mono">DEMAND</text>
-            <text x="380" y="52" fill="#a9c3df" font-size="12" font-family="DM Mono">SUPPLY</text>
-            <text class="hero-eq-label" x="266" y="200" fill="#b9f36b" font-size="11" font-family="DM Mono">EQUILIBRIUM</text>
+            <text class="hero-label hero-label-d" x="380" y="287" fill="#b9f36b" font-size="12" font-family="DM Mono">DEMAND</text>
+            <text class="hero-label hero-label-s" x="380" y="52" fill="#a9c3df" font-size="12" font-family="DM Mono">SUPPLY</text>
+            <text class="hero-eq-label hero-label" x="266" y="200" fill="#b9f36b" font-size="11" font-family="DM Mono">EQUILIBRIUM</text>
           </svg>
         </div>
 
         <div class="visual-bottom">
           <div><span class="metric-label">MODEL</span><strong>SUPPLY / DEMAND</strong></div>
-          <div><span class="metric-label">VARIABLES</span><strong>PRICE · QUANTITY</strong></div>
-          <div class="visual-status"><span class="live-dot"></span> INTERACTIVE</div>
+          <div><span class="metric-label">PRICE · QUANTITY</span><strong id="heroReadout">50.0 · 50.0</strong></div>
+          <div class="visual-status"><span class="live-dot"></span> <span id="heroStatus">LIVE MARKET</span></div>
         </div>
       </div>
     </section>
 
-    <!-- INTRO STRIP -->
-    <section class="intro-strip">
-      <div class="section-wrap intro-inner">
-        <p>THREE LEVELS OF ECONOMIC ANALYSIS</p>
-        <div class="intro-levels">
-          <span>01 / MICRO</span>
-          <span>02 / MESO</span>
-          <span>03 / MACRO</span>
-        </div>
+    <!-- TICKER -->
+    <section class="ticker" aria-label="Topics covered">
+      <div class="ticker-track">
+        <div class="ticker-group"><span>Supply & demand</span><span>Elasticity</span><span>Opportunity cost</span><span>Value chains</span><span>Industrial clusters</span><span>Market concentration</span><span>GDP</span><span>Inflation</span><span>Unemployment</span><span>Monetary policy</span><span>Fiscal policy</span><span>Deadweight loss</span><span>Productivity</span><span>Trade balance</span></div>
+        <div class="ticker-group" aria-hidden="true"><span>Supply & demand</span><span>Elasticity</span><span>Opportunity cost</span><span>Value chains</span><span>Industrial clusters</span><span>Market concentration</span><span>GDP</span><span>Inflation</span><span>Unemployment</span><span>Monetary policy</span><span>Fiscal policy</span><span>Deadweight loss</span><span>Productivity</span><span>Trade balance</span></div>
       </div>
     </section>
 
-    <!-- LABORATORIES -->
+<!-- LABORATORIES -->
     <section class="section section-wrap" id="laboratories">
       <div class="section-heading">
         <div>
-          <div class="eyebrow">01 — LEARNING ENVIRONMENTS</div>
+          <div class="eyebrow">01 — THREE LEVELS</div>
           <h2>Explore the <span>economy.</span></h2>
         </div>
         <p class="section-intro">
@@ -148,7 +145,7 @@
           <div class="topic-tags">
             <span>Supply & demand</span><span>Consumer choice</span><span>Elasticity</span>
           </div>
-          <a href="#micro-topics" class="text-link">Explore microeconomics <span>↗</span></a>
+          <a href="learn.html#micro-topics" class="text-link">Explore microeconomics <span>↗</span></a>
         </article>
 
         <article class="lab-card lab-meso">
@@ -171,7 +168,7 @@
           <div class="topic-tags">
             <span>Value chains</span><span>Clusters</span><span>Productivity</span>
           </div>
-          <a href="#meso-topics" class="text-link">Explore mesoeconomics <span>↗</span></a>
+          <a href="learn.html#meso-topics" class="text-link">Explore mesoeconomics <span>↗</span></a>
         </article>
 
         <article class="lab-card lab-macro">
@@ -196,330 +193,75 @@
           <div class="topic-tags">
             <span>GDP</span><span>Inflation</span><span>Fiscal policy</span>
           </div>
-          <a href="#macro-topics" class="text-link">Explore macroeconomics <span>↗</span></a>
+          <a href="learn.html#macro-topics" class="text-link">Explore macroeconomics <span>↗</span></a>
         </article>
       </div>
     </section>
 
-    <!-- SIMULATOR -->
-    <section class="section simulator-section" id="simulator">
-      <div class="section-wrap">
-        <div class="section-heading">
-          <div>
-            <div class="eyebrow">02 — EXPERIMENTAL ECONOMICS</div>
-            <h2>Play with the <span>market.</span></h2>
-          </div>
-          <p class="section-intro">
-            Change the conditions of a market and observe how
-            equilibrium responds.
-          </p>
-        </div>
-
-        <div class="simulator-layout">
-          <div class="sim-controls">
-            <div class="panel-heading">
-              <div><span class="panel-index">MODEL INPUTS</span><h3>Control the market</h3></div>
-              <button class="reset-button" id="resetMarket">↺ Reset</button>
-            </div>
-
-            <div class="slider-control">
-              <div class="slider-title"><label for="demandSlider">Demand intensity</label><output id="demandValue">50</output></div>
-              <input type="range" id="demandSlider" min="10" max="90" value="50">
-              <div class="range-labels"><span>LOW</span><span>HIGH</span></div>
-            </div>
-
-            <div class="slider-control">
-              <div class="slider-title"><label for="supplySlider">Supply intensity</label><output id="supplyValue">50</output></div>
-              <input type="range" id="supplySlider" min="10" max="90" value="50">
-              <div class="range-labels"><span>LOW</span><span>HIGH</span></div>
-            </div>
-
-            <div class="slider-control">
-              <div class="slider-title"><label for="taxSlider">Per-unit tax</label><output id="taxValue">0</output></div>
-              <input type="range" id="taxSlider" min="0" max="40" value="0">
-              <div class="range-labels"><span>NO TAX</span><span>HIGH TAX</span></div>
-            </div>
-
-            <div class="slider-pair">
-              <div class="slider-control">
-                <div class="slider-title"><label for="demandSlopeSlider">Demand elasticity</label><output id="demandSlopeValue">Medium</output></div>
-                <input type="range" id="demandSlopeSlider" min="1" max="5" step="1" value="3">
-                <div class="range-labels"><span>STEEP</span><span>FLAT</span></div>
-              </div>
-
-              <div class="slider-control">
-                <div class="slider-title"><label for="supplySlopeSlider">Supply elasticity</label><output id="supplySlopeValue">Medium</output></div>
-                <input type="range" id="supplySlopeSlider" min="1" max="5" step="1" value="3">
-                <div class="range-labels"><span>STEEP</span><span>FLAT</span></div>
-              </div>
-            </div>
-
-            <div class="model-explanation" id="marketExplanation" aria-live="polite">
-              <span class="explanation-icon">↗</span>
-              <p>Adjust the variables to explore how demand, supply and taxation influence market equilibrium.</p>
-            </div>
-          </div>
-
-          <div class="sim-chart-panel">
-            <div class="chart-panel-header">
-              <div><span class="panel-index">LIVE VISUALIZATION</span><h3>Market equilibrium</h3></div>
-              <span class="chart-live"><span class="live-dot"></span> LIVE MODEL</span>
-            </div>
-
-            <div class="market-chart-wrap">
-              <canvas id="marketChart" aria-label="Supply and demand market chart" role="img"></canvas>
-            </div>
-
-            <div class="equilibrium-results">
-              <div><span>BUYER PRICE</span><strong id="buyerPrice">50.0</strong></div>
-              <div><span>SELLER PRICE</span><strong id="sellerPrice">50.0</strong></div>
-              <div><span>QUANTITY</span><strong id="equilibriumQuantity">50.0</strong></div>
-            </div>
-            <div class="welfare-results" aria-live="polite">
-              <div><span><i class="swatch swatch-consumer"></i>CONSUMER SURPLUS</span><strong id="consumerSurplus">0</strong></div>
-              <div><span><i class="swatch swatch-producer"></i>PRODUCER SURPLUS</span><strong id="producerSurplus">0</strong></div>
-              <div><span><i class="swatch swatch-revenue"></i>TAX REVENUE</span><strong id="taxRevenue">0</strong></div>
-              <div><span><i class="swatch swatch-deadweight"></i>DEADWEIGHT LOSS</span><strong id="deadweightLoss">0</strong></div>
-            </div>
-
-            <p class="chart-footnote">Illustrative linear market model. Prices and quantities are expressed in model units.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CALCULATORS -->
-    <section class="section section-wrap" id="calculators">
+    <!-- INSIDE THE LAB -->
+    <section class="section section-wrap features-section" id="inside">
       <div class="section-heading">
         <div>
-          <div class="eyebrow">03 — ECONOMIC TOOLKIT</div>
-          <h2>Calculate. <span>Understand.</span></h2>
+          <div class="eyebrow">02 — INSIDE THE LAB</div>
+          <h2>Learn by <span>doing.</span></h2>
         </div>
         <p class="section-intro">
-          Move beyond memorizing formulas. Use them, test them
-          and understand what the results mean.
+          Four ways to work with economic ideas: run a model, test a formula,
+          read the concept, then check your understanding.
         </p>
       </div>
 
-      <div class="calculator-grid">
+      <div class="stat-strip">
+        <div><strong data-count="3">3</strong><span>LEVELS OF ANALYSIS</span></div>
+        <div><strong data-count="6">6</strong><span>CALCULATORS</span></div>
+        <div><strong data-count="20">20</strong><span>CORE TOPICS</span></div>
+        <div><strong data-count="18">18</strong><span>QUIZ QUESTIONS</span></div>
+      </div>
 
-        <!-- ELASTICITY -->
-        <article class="calculator-card">
-          <div class="calculator-card-header">
-            <span class="calc-icon">ε</span>
-            <span class="calc-category">MICROECONOMICS</span>
+      <div class="feature-grid">
+        <a class="feature-card feature-dark" href="simulator.html">
+          <span class="feature-index">01 / SIMULATE</span>
+          <div class="feature-art art-sim" aria-hidden="true">
+            <svg viewBox="0 0 200 110"><path class="fa-s" d="M15 95 L185 15"/><path class="fa-d" d="M15 15 L185 95"/><circle class="fa-eq" cx="100" cy="55" r="6"/></svg>
           </div>
-          <h3>Price elasticity of demand</h3>
-          <p>Measure how responsive quantity demanded is to a price change using the midpoint method.</p>
+          <h3>Market simulator</h3>
+          <p>Shift demand and supply, change elasticities, add a tax, and watch surplus and deadweight loss respond.</p>
+          <span class="feature-link">Open simulator <span>→</span></span>
+        </a>
 
-          <div class="calc-inputs two-columns">
-            <label>Initial price (P1)<input id="p1" type="number" value="10" step="any"></label>
-            <label>New price (P2)<input id="p2" type="number" value="12" step="any"></label>
-            <label>Initial quantity (Q1)<input id="q1" type="number" value="100" step="any"></label>
-            <label>New quantity (Q2)<input id="q2" type="number" value="80" step="any"></label>
+        <a class="feature-card" href="calculators.html">
+          <span class="feature-index">02 / CALCULATE</span>
+          <div class="feature-art art-calc" aria-hidden="true">
+            <span>ε</span><span>Σ</span><span>π</span><span>u</span><span>▥</span><span>σ</span>
           </div>
+          <h3>Economic calculators</h3>
+          <p>Elasticity, GDP, inflation, unemployment, HHI and statistics, with every step of the working shown.</p>
+          <span class="feature-link">Use calculators <span>→</span></span>
+        </a>
 
-          <button class="button button-dark calc-button" id="calculateElasticity">Calculate elasticity <span>→</span></button>
-          <div class="calc-result" id="elasticityResult" aria-live="polite">Your result will appear here.</div>
-          <div class="formula-note">PED = %ΔQ / %ΔP · Midpoint method</div>
-        </article>
-
-        <!-- GDP -->
-        <article class="calculator-card">
-          <div class="calculator-card-header">
-            <span class="calc-icon">Σ</span>
-            <span class="calc-category">MACROECONOMICS</span>
+        <a class="feature-card" href="learn.html">
+          <span class="feature-index">03 / UNDERSTAND</span>
+          <div class="feature-art art-learn" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
           </div>
-          <h3>GDP expenditure approach</h3>
-          <p>Calculate gross domestic product from consumption, investment, government purchases and net exports.</p>
+          <h3>Concept library</h3>
+          <p>Twenty core topics across micro, meso and macro, explained by ÉcoBot with formulas and examples.</p>
+          <span class="feature-link">Browse library <span>→</span></span>
+        </a>
 
-          <div class="calc-inputs two-columns">
-            <label>Consumption (C)<input id="gdpC" type="number" value="500" step="any"></label>
-            <label>Investment (I)<input id="gdpI" type="number" value="150" step="any"></label>
-            <label>Government (G)<input id="gdpG" type="number" value="200" step="any"></label>
-            <label>Exports (X)<input id="gdpX" type="number" value="120" step="any"></label>
-            <label>Imports (M)<input id="gdpM" type="number" value="90" step="any"></label>
+        <a class="feature-card" href="quiz.html">
+          <span class="feature-index">04 / CHECK</span>
+          <div class="feature-art art-quiz" aria-hidden="true">
+            <span>A</span><span class="is-right">B</span><span>C</span>
           </div>
-
-          <button class="button button-dark calc-button" id="calculateGDP">Calculate GDP <span>→</span></button>
-          <div class="calc-result" id="gdpResult" aria-live="polite">Your result will appear here.</div>
-          <div class="formula-note">GDP = C + I + G + (X − M)</div>
-        </article>
-
-        <!-- INFLATION -->
-        <article class="calculator-card">
-          <div class="calculator-card-header">
-            <span class="calc-icon">π</span>
-            <span class="calc-category">MACROECONOMICS</span>
-          </div>
-          <h3>Inflation &amp; purchasing power</h3>
-          <p>Compute the inflation rate between two price index values and see what money is really worth.</p>
-          <div class="calc-inputs two-columns">
-            <label>Previous CPI<input id="cpiOld" type="number" value="100" step="any"></label>
-            <label>Current CPI<input id="cpiNew" type="number" value="105" step="any"></label>
-            <label>Amount of money (optional)<input id="nominalValue" type="number" value="1000" step="any"></label>
-          </div>
-          <button class="button button-dark calc-button" id="calculateInflation">Calculate inflation <span>→</span></button>
-          <div class="calc-result" id="inflationResult" aria-live="polite">Your result will appear here.</div>
-          <div class="formula-note">π = (CPI₁ − CPI₀) / CPI₀ × 100</div>
-        </article>
-
-        <!-- UNEMPLOYMENT -->
-        <article class="calculator-card">
-          <div class="calculator-card-header">
-            <span class="calc-icon">u</span>
-            <span class="calc-category">LABOUR MARKET</span>
-          </div>
-          <h3>Unemployment &amp; participation</h3>
-          <p>Measure the unemployment rate and, with the working-age population, labour force participation.</p>
-          <div class="calc-inputs two-columns">
-            <label>Employed<input id="employed" type="number" value="9200" step="any"></label>
-            <label>Unemployed<input id="unemployed" type="number" value="800" step="any"></label>
-            <label>Working-age population (optional)<input id="workingAgePop" type="number" value="16000" step="any"></label>
-          </div>
-          <button class="button button-dark calc-button" id="calculateUnemployment">Calculate rates <span>→</span></button>
-          <div class="calc-result" id="unemploymentResult" aria-live="polite">Your result will appear here.</div>
-          <div class="formula-note">u = Unemployed / (Employed + Unemployed) × 100</div>
-        </article>
-
-        <!-- HHI -->
-        <article class="calculator-card">
-          <div class="calculator-card-header">
-            <span class="calc-icon">▥</span>
-            <span class="calc-category">INDUSTRIAL ORGANIZATION</span>
-          </div>
-          <h3>Market concentration (HHI)</h3>
-          <p>Estimate market concentration by summing the squared market shares of competing firms.</p>
-
-          <label class="full-input">Market shares (%)<textarea id="hhiShares" rows="3">40, 30, 20, 10</textarea></label>
-          <span class="input-hint">Separate each firm's market share with a comma. Shares should total 100%.</span>
-
-          <button class="button button-dark calc-button" id="calculateHHI">Calculate HHI <span>→</span></button>
-          <div class="calc-result" id="hhiResult" aria-live="polite">Your result will appear here.</div>
-          <div class="formula-note">HHI = Σ (market share)²</div>
-        </article>
-
-        <!-- STATISTICS -->
-        <article class="calculator-card">
-          <div class="calculator-card-header">
-            <span class="calc-icon">x̄</span>
-            <span class="calc-category">DESCRIPTIVE STATISTICS</span>
-          </div>
-          <h3>Descriptive statistics</h3>
-          <p>Explore the central tendency and dispersion of a dataset.</p>
-
-          <label class="full-input">Your dataset<textarea id="statsData" rows="3">10, 15, 20, 20, 25, 30</textarea></label>
-          <span class="input-hint">Enter numerical observations separated by commas.</span>
-
-          <button class="button button-dark calc-button" id="calculateStats">Analyze dataset <span>→</span></button>
-          <div class="calc-result stats-result" id="statsResult" aria-live="polite">Your results will appear here.</div>
-          <div class="formula-note">Mean · Median · Mode · Quartiles · Variance · σ</div>
-        </article>
+          <h3>Knowledge check</h3>
+          <p>Short questions with worked explanations, a review of what you missed and a saved personal best.</p>
+          <span class="feature-link">Take the quiz <span>→</span></span>
+        </a>
       </div>
     </section>
 
-    <!-- OBSERVATORY -->
-    <section class="section observatory-section" id="observatory">
-      <div class="section-wrap">
-        <div class="observatory-header">
-          <div>
-            <div class="eyebrow">04 — ECONOMIC INTELLIGENCE</div>
-            <h2>The Economic <span>Observatory.</span></h2>
-            <p>Connect economic theory to the world around you. Explore the indicators that help describe an economy.</p>
-          </div>
-          <span class="observatory-mark">E / O</span>
-        </div>
-
-        <div class="indicator-grid">
-          <article class="indicator-card">
-            <span class="indicator-number">01</span>
-            <span class="indicator-symbol">GDP</span>
-            <h3>Economic output</h3>
-            <p>Measure the value of final goods and services produced within an economy.</p>
-            <span class="indicator-question">What is being produced?</span>
-          </article>
-          <article class="indicator-card">
-            <span class="indicator-number">02</span>
-            <span class="indicator-symbol">%</span>
-            <h3>Inflation</h3>
-            <p>Track changes in the general price level and their implications for purchasing power.</p>
-            <span class="indicator-question">How are prices changing?</span>
-          </article>
-          <article class="indicator-card">
-            <span class="indicator-number">03</span>
-            <span class="indicator-symbol">↗</span>
-            <h3>Employment</h3>
-            <p>Examine labour market participation, employment and unemployment.</p>
-            <span class="indicator-question">Who is working?</span>
-          </article>
-          <article class="indicator-card">
-            <span class="indicator-number">04</span>
-            <span class="indicator-symbol">⇄</span>
-            <h3>International trade</h3>
-            <p>Understand exports, imports, trade balances and global economic relationships.</p>
-            <span class="indicator-question">How does the economy connect?</span>
-          </article>
-        </div>
-
-        <div class="observatory-disclaimer">
-          <span>RESEARCH NOTE</span>
-          <p>This is a conceptual learning section, not a live statistical database. Country indicators should be added with dated, verifiable sources before being presented as current data.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- TOPICS -->
-    <section class="section section-wrap topics-section" id="topics">
-      <div class="section-heading">
-        <div>
-          <div class="eyebrow">05 — KNOWLEDGE LIBRARY</div>
-          <h2>Build your <span>foundations.</span></h2>
-        </div>
-        <p class="section-intro">Explore essential concepts across the three levels of economic analysis.</p>
-      </div>
-
-      <div class="topic-groups">
-        <div class="topic-group" id="micro-topics">
-          <div class="topic-group-heading"><span>01</span><h3>Microeconomics</h3></div>
-          <div class="topic-list">
-            <button class="topic-item" data-question="Explain scarcity and choice in economics."><span>Scarcity and choice</span><span>↗</span></button>
-            <button class="topic-item" data-question="Explain opportunity cost with an example."><span>Opportunity cost</span><span>↗</span></button>
-            <button class="topic-item" data-question="Explain supply and demand and market equilibrium."><span>Supply and demand</span><span>↗</span></button>
-            <button class="topic-item" data-question="Explain price elasticity of demand."><span>Price elasticity</span><span>↗</span></button>
-            <button class="topic-item" data-question="Explain consumer utility and preferences."><span>Utility and preferences</span><span>↗</span></button>
-            <button class="topic-item" data-question="Explain production costs and marginal cost."><span>Production and costs</span><span>↗</span></button>
-            <button class="topic-item" data-question="Explain monopoly, oligopoly and perfect competition."><span>Market structures</span><span>↗</span></button>
-          </div>
-        </div>
-
-        <div class="topic-group" id="meso-topics">
-          <div class="topic-group-heading"><span>02</span><h3>Mesoeconomics</h3></div>
-          <div class="topic-list">
-            <button class="topic-item" data-question="Explain value chains in mesoeconomics."><span>Value chains</span><span>↗</span></button>
-            <button class="topic-item" data-question="What are industrial clusters?"><span>Industrial clusters</span><span>↗</span></button>
-            <button class="topic-item" data-question="Explain sectoral productivity."><span>Sectoral productivity</span><span>↗</span></button>
-            <button class="topic-item" data-question="Explain market concentration and HHI."><span>Market concentration</span><span>↗</span></button>
-            <button class="topic-item" data-question="Explain regional economic development."><span>Regional development</span><span>↗</span></button>
-            <button class="topic-item" data-question="Explain supply chains and industrial organization."><span>Supply chains</span><span>↗</span></button>
-          </div>
-        </div>
-
-        <div class="topic-group" id="macro-topics">
-          <div class="topic-group-heading"><span>03</span><h3>Macroeconomics</h3></div>
-          <div class="topic-list">
-            <button class="topic-item" data-question="Explain GDP and the expenditure approach."><span>GDP and national income</span><span>↗</span></button>
-            <button class="topic-item" data-question="Explain inflation and how it is measured."><span>Inflation</span><span>↗</span></button>
-            <button class="topic-item" data-question="Explain unemployment and its different types."><span>Unemployment</span><span>↗</span></button>
-            <button class="topic-item" data-question="Explain economic growth."><span>Economic growth</span><span>↗</span></button>
-            <button class="topic-item" data-question="Explain monetary policy and interest rates."><span>Monetary policy</span><span>↗</span></button>
-            <button class="topic-item" data-question="Explain fiscal policy and government spending."><span>Fiscal policy</span><span>↗</span></button>
-            <button class="topic-item" data-question="Explain international trade and net exports."><span>International trade</span><span>↗</span></button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CROSS LEVEL -->
+<!-- CROSS LEVEL -->
     <section class="cross-level-section">
       <div class="section-wrap cross-level-inner">
         <div>
@@ -536,38 +278,10 @@
       </div>
     </section>
 
-    <!-- KNOWLEDGE CHECK -->
-    <section class="section section-wrap quiz-section" id="quiz">
-      <div class="section-heading">
-        <div>
-          <div class="eyebrow">06 — KNOWLEDGE CHECK</div>
-          <h2>Test your <span>thinking.</span></h2>
-        </div>
-        <p class="section-intro">
-          Short questions with worked explanations. Pick a level,
-          answer, and learn from every mistake.
-        </p>
-      </div>
-
-      <div class="quiz-layout">
-        <div class="quiz-filters" role="group" aria-label="Choose a quiz level">
-          <button type="button" class="quiz-filter active" data-level="all" aria-pressed="true">All levels</button>
-          <button type="button" class="quiz-filter" data-level="micro" aria-pressed="false">Micro</button>
-          <button type="button" class="quiz-filter" data-level="meso" aria-pressed="false">Meso</button>
-          <button type="button" class="quiz-filter" data-level="macro" aria-pressed="false">Macro</button>
-          <button type="button" class="quiz-filter" data-level="statistics" aria-pressed="false">Statistics</button>
-        </div>
-
-        <article class="quiz-card" id="quizCard">
-          <noscript>Enable JavaScript to take the quiz.</noscript>
-        </article>
-      </div>
-    </section>
-
-    <!-- ABOUT -->
+<!-- ABOUT -->
     <section class="section section-wrap about-section" id="about">
       <div class="about-left">
-        <div class="eyebrow">07 — THE IDEA</div>
+        <div class="eyebrow">04 — THE IDEA</div>
         <h2>Economics should be <span>experienced.</span></h2>
       </div>
       <div class="about-right">
@@ -579,18 +293,46 @@
       </div>
     </section>
 
+    <!-- CTA -->
+    <section class="cta-band">
+      <div class="section-wrap cta-inner">
+        <h2>Ready to <span>change the variables?</span></h2>
+        <div class="cta-actions">
+          <a href="simulator.html" class="button button-primary">Open the simulator <span>↗</span></a>
+          <a href="quiz.html" class="button button-ghost">Test yourself <span>→</span></a>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- FOOTER -->
   <footer class="site-footer">
-    <div class="section-wrap footer-inner">
-      <a class="brand footer-brand" href="#home"><span class="brand-mark">É</span><span>ÉcoLab<span class="brand-dot">.</span></span></a>
-      <p>Understand the economy. Change the variables.</p>
-      <a href="#home" class="back-top">BACK TO TOP ↑</a>
+    <div class="section-wrap footer-grid">
+      <div class="footer-about">
+        <a class="brand footer-brand" href="index.html"><span class="brand-mark">É</span><span>ÉcoLab<span class="brand-dot">.</span></span></a>
+        <p>Understand the economy. Change the variables. An interactive laboratory for micro, meso and macroeconomics.</p>
+      </div>
+
+      <nav class="footer-col" aria-label="Laboratory">
+        <span>LABORATORY</span>
+        <a href="simulator.html">Market simulator</a>
+        <a href="calculators.html">Calculators</a>
+        <a href="quiz.html">Knowledge check</a>
+      </nav>
+
+      <nav class="footer-col" aria-label="Library">
+        <span>LIBRARY</span>
+        <a href="learn.html#micro-topics">Microeconomics</a>
+        <a href="learn.html#meso-topics">Mesoeconomics</a>
+        <a href="learn.html#macro-topics">Macroeconomics</a>
+        <a href="learn.html#observatory">Indicators</a>
+      </nav>
     </div>
+
     <div class="section-wrap footer-bottom">
       <span>© <span id="currentYear"></span> ÉcoLab. Educational project.</span>
-      <span>BUILT TO MAKE ECONOMICS CLICK.</span>
+      <a href="#top" class="back-top">BACK TO TOP ↑</a>
     </div>
   </footer>
 

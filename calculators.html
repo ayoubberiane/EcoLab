@@ -1,0 +1,285 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Calculate price elasticity, GDP, inflation, unemployment, market concentration (HHI) and descriptive statistics, with the working shown.">
+  <meta name="theme-color" content="#101b16">
+  <title>Economic Calculators — ÉcoLab</title>
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23101b16'/%3E%3Ctext x='32' y='45' font-family='Arial,sans-serif' font-size='38' font-weight='700' text-anchor='middle' fill='%23b9f36b'%3E%C3%89%3C/text%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+
+<body class="page-calculators" id="top">
+
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- NAVIGATION -->
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="ÉcoLab home">
+      <span class="brand-mark">É</span>
+      <span>ÉcoLab<span class="brand-dot">.</span></span>
+    </a>
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav class="main-nav" id="mainNav" aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="simulator.html">Simulator</a>
+      <a href="calculators.html" class="active" aria-current="page">Calculators</a>
+      <a href="learn.html">Library</a>
+      <a href="quiz.html">Quiz</a>
+      <a href="simulator.html" class="nav-cta">Open the lab <span>↗</span></a>
+    </nav>
+  </header>
+
+  <main id="main">
+
+    <!-- PAGE HERO -->
+    <section class="page-hero">
+      <div class="section-wrap page-hero-inner">
+        <div class="page-hero-copy">
+          <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">ÉcoLab</a><span aria-hidden="true">/</span><span aria-current="page">Calculators</span></nav>
+          <div class="eyebrow"><span class="live-dot"></span> ECONOMIC TOOLKIT</div>
+          <h1 class="page-title">Calculate. <span>Understand.</span></h1>
+          <p class="page-intro">Move beyond memorising formulas. Use them, test them, and read what the results mean. Every answer shows its working.</p>
+        </div>
+        <div class="page-hero-art" aria-hidden="true">
+          <svg viewBox="0 0 320 220" class="motif">
+            <path class="motif-grid" d="M20 20 V200 H300" />
+            <rect class="motif-bar" x="45" y="130" width="34" height="70" />
+            <rect class="motif-bar" x="100" y="95" width="34" height="105" />
+            <rect class="motif-bar" x="155" y="115" width="34" height="85" />
+            <rect class="motif-bar" x="210" y="60" width="34" height="140" />
+            <path class="motif-line motif-a" pathLength="1" d="M40 150 L 115 105 L 170 120 L 260 50" />
+          </svg>
+        </div>
+      </div>
+    </section>
+
+<!-- CALCULATORS -->
+    <section class="section section-wrap" id="calculators">
+      <div class="filter-bar" role="group" aria-label="Filter calculators by level">
+        <button type="button" class="filter-chip active" data-filter="all" aria-pressed="true">All <span>6</span></button>
+        <button type="button" class="filter-chip" data-filter="micro" aria-pressed="false">Micro <span>1</span></button>
+        <button type="button" class="filter-chip" data-filter="meso" aria-pressed="false">Meso <span>1</span></button>
+        <button type="button" class="filter-chip" data-filter="macro" aria-pressed="false">Macro <span>3</span></button>
+        <button type="button" class="filter-chip" data-filter="statistics" aria-pressed="false">Statistics <span>1</span></button>
+      </div>
+
+      <div class="calculator-grid">
+
+        <!-- ELASTICITY -->
+        <article class="calculator-card" data-category="micro">
+          <div class="calculator-card-header">
+            <span class="calc-icon">ε</span>
+            <span class="calc-category">MICROECONOMICS</span>
+          </div>
+          <h3>Price elasticity of demand</h3>
+          <p>Measure how responsive quantity demanded is to a price change using the midpoint method.</p>
+
+          <div class="calc-inputs two-columns">
+            <label>Initial price (P1)<input id="p1" type="number" value="10" step="any"></label>
+            <label>New price (P2)<input id="p2" type="number" value="12" step="any"></label>
+            <label>Initial quantity (Q1)<input id="q1" type="number" value="100" step="any"></label>
+            <label>New quantity (Q2)<input id="q2" type="number" value="80" step="any"></label>
+          </div>
+
+          <button class="button button-dark calc-button" id="calculateElasticity">Calculate elasticity <span>→</span></button>
+          <div class="calc-result" id="elasticityResult" aria-live="polite">Your result will appear here.</div>
+          <div class="formula-note">PED = %ΔQ / %ΔP · Midpoint method</div>
+        </article>
+
+        <!-- GDP -->
+        <article class="calculator-card" data-category="macro">
+          <div class="calculator-card-header">
+            <span class="calc-icon">Σ</span>
+            <span class="calc-category">MACROECONOMICS</span>
+          </div>
+          <h3>GDP expenditure approach</h3>
+          <p>Calculate gross domestic product from consumption, investment, government purchases and net exports.</p>
+
+          <div class="calc-inputs two-columns">
+            <label>Consumption (C)<input id="gdpC" type="number" value="500" step="any"></label>
+            <label>Investment (I)<input id="gdpI" type="number" value="150" step="any"></label>
+            <label>Government (G)<input id="gdpG" type="number" value="200" step="any"></label>
+            <label>Exports (X)<input id="gdpX" type="number" value="120" step="any"></label>
+            <label>Imports (M)<input id="gdpM" type="number" value="90" step="any"></label>
+          </div>
+
+          <button class="button button-dark calc-button" id="calculateGDP">Calculate GDP <span>→</span></button>
+          <div class="calc-result" id="gdpResult" aria-live="polite">Your result will appear here.</div>
+          <div class="formula-note">GDP = C + I + G + (X − M)</div>
+        </article>
+
+        <!-- INFLATION -->
+        <article class="calculator-card" data-category="macro">
+          <div class="calculator-card-header">
+            <span class="calc-icon">π</span>
+            <span class="calc-category">MACROECONOMICS</span>
+          </div>
+          <h3>Inflation &amp; purchasing power</h3>
+          <p>Compute the inflation rate between two price index values and see what money is really worth.</p>
+          <div class="calc-inputs two-columns">
+            <label>Previous CPI<input id="cpiOld" type="number" value="100" step="any"></label>
+            <label>Current CPI<input id="cpiNew" type="number" value="105" step="any"></label>
+            <label>Amount of money (optional)<input id="nominalValue" type="number" value="1000" step="any"></label>
+          </div>
+          <button class="button button-dark calc-button" id="calculateInflation">Calculate inflation <span>→</span></button>
+          <div class="calc-result" id="inflationResult" aria-live="polite">Your result will appear here.</div>
+          <div class="formula-note">π = (CPI₁ − CPI₀) / CPI₀ × 100</div>
+        </article>
+
+        <!-- UNEMPLOYMENT -->
+        <article class="calculator-card" data-category="macro">
+          <div class="calculator-card-header">
+            <span class="calc-icon">u</span>
+            <span class="calc-category">LABOUR MARKET</span>
+          </div>
+          <h3>Unemployment &amp; participation</h3>
+          <p>Measure the unemployment rate and, with the working-age population, labour force participation.</p>
+          <div class="calc-inputs two-columns">
+            <label>Employed<input id="employed" type="number" value="9200" step="any"></label>
+            <label>Unemployed<input id="unemployed" type="number" value="800" step="any"></label>
+            <label>Working-age population (optional)<input id="workingAgePop" type="number" value="16000" step="any"></label>
+          </div>
+          <button class="button button-dark calc-button" id="calculateUnemployment">Calculate rates <span>→</span></button>
+          <div class="calc-result" id="unemploymentResult" aria-live="polite">Your result will appear here.</div>
+          <div class="formula-note">u = Unemployed / (Employed + Unemployed) × 100</div>
+        </article>
+
+        <!-- HHI -->
+        <article class="calculator-card" data-category="meso">
+          <div class="calculator-card-header">
+            <span class="calc-icon">▥</span>
+            <span class="calc-category">INDUSTRIAL ORGANIZATION</span>
+          </div>
+          <h3>Market concentration (HHI)</h3>
+          <p>Estimate market concentration by summing the squared market shares of competing firms.</p>
+
+          <label class="full-input">Market shares (%)<textarea id="hhiShares" rows="3">40, 30, 20, 10</textarea></label>
+          <span class="input-hint">Separate each firm's market share with a comma. Shares should total 100%.</span>
+
+          <button class="button button-dark calc-button" id="calculateHHI">Calculate HHI <span>→</span></button>
+          <div class="calc-result" id="hhiResult" aria-live="polite">Your result will appear here.</div>
+          <div class="formula-note">HHI = Σ (market share)²</div>
+        </article>
+
+        <!-- STATISTICS -->
+        <article class="calculator-card" data-category="statistics">
+          <div class="calculator-card-header">
+            <span class="calc-icon">x̄</span>
+            <span class="calc-category">DESCRIPTIVE STATISTICS</span>
+          </div>
+          <h3>Descriptive statistics</h3>
+          <p>Explore the central tendency and dispersion of a dataset.</p>
+
+          <label class="full-input">Your dataset<textarea id="statsData" rows="3">10, 15, 20, 20, 25, 30</textarea></label>
+          <span class="input-hint">Enter numerical observations separated by commas.</span>
+
+          <button class="button button-dark calc-button" id="calculateStats">Analyze dataset <span>→</span></button>
+          <div class="calc-result stats-result" id="statsResult" aria-live="polite">Your results will appear here.</div>
+          <div class="formula-note">Mean · Median · Mode · Quartiles · Variance · σ</div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="section-wrap footer-grid">
+      <div class="footer-about">
+        <a class="brand footer-brand" href="index.html"><span class="brand-mark">É</span><span>ÉcoLab<span class="brand-dot">.</span></span></a>
+        <p>Understand the economy. Change the variables. An interactive laboratory for micro, meso and macroeconomics.</p>
+      </div>
+
+      <nav class="footer-col" aria-label="Laboratory">
+        <span>LABORATORY</span>
+        <a href="simulator.html">Market simulator</a>
+        <a href="calculators.html">Calculators</a>
+        <a href="quiz.html">Knowledge check</a>
+      </nav>
+
+      <nav class="footer-col" aria-label="Library">
+        <span>LIBRARY</span>
+        <a href="learn.html#micro-topics">Microeconomics</a>
+        <a href="learn.html#meso-topics">Mesoeconomics</a>
+        <a href="learn.html#macro-topics">Macroeconomics</a>
+        <a href="learn.html#observatory">Indicators</a>
+      </nav>
+    </div>
+
+    <div class="section-wrap footer-bottom">
+      <span>© <span id="currentYear"></span> ÉcoLab. Educational project.</span>
+      <a href="#top" class="back-top">BACK TO TOP ↑</a>
+    </div>
+  </footer>
+
+  <!-- ÉCOBOT LAUNCHER -->
+  <button class="ecobot-launcher" id="ecobotLauncher"
+    aria-label="Open ÉcoBot" aria-expanded="false" aria-controls="ecobotWindow">
+    <span class="ecobot-launcher-icon">✳</span>
+    <span class="ecobot-launcher-label">Ask ÉcoBot</span>
+  </button>
+
+  <!-- ÉCOBOT CHAT WINDOW -->
+  <section class="ecobot-window" id="ecobotWindow"
+    aria-label="ÉcoBot economics tutor" hidden>
+
+    <header class="ecobot-header">
+      <div class="ecobot-avatar">É</div>
+      <div class="ecobot-identity">
+        <strong>ÉcoBot</strong>
+        <span><i></i> Your economics tutor</span>
+      </div>
+      <button id="ecobotClose" class="ecobot-close" aria-label="Close chatbot">×</button>
+    </header>
+
+    <div class="ecobot-context">
+      <span>LEARNING DOMAIN</span>
+      <select id="ecobotDomain" aria-label="Choose economics domain">
+        <option value="general">General economics</option>
+        <option value="micro">Microeconomics</option>
+        <option value="meso">Mesoeconomics</option>
+        <option value="macro">Macroeconomics</option>
+        <option value="statistics">Statistics</option>
+      </select>
+    </div>
+
+    <div class="ecobot-messages" id="ecobotMessages" aria-live="polite">
+      <div class="bot-message">
+        <span class="message-label">ÉCOBOT · WELCOME</span>
+        <p>Hello! I'm ÉcoBot, your personal economics tutor.</p>
+        <p>Ask me about an economic concept, a formula, a calculation or a real-world phenomenon. Where shall we begin?</p>
+      </div>
+
+      <div class="ecobot-suggestions">
+        <button class="suggestion-chip" data-question="Explain the difference between microeconomics and macroeconomics.">Micro vs Macro</button>
+        <button class="suggestion-chip" data-question="Explain price elasticity of demand with an example.">Price elasticity</button>
+        <button class="suggestion-chip" data-question="Teach me how to calculate GDP.">Calculate GDP</button>
+        <button class="suggestion-chip" data-question="Explain the difference between mean and median.">Statistics</button>
+      </div>
+    </div>
+
+    <form class="ecobot-form" id="ecobotForm">
+      <input type="text" id="ecobotInput"
+        placeholder="Ask an economics question..."
+        autocomplete="off" aria-label="Your question" required>
+      <button type="submit" aria-label="Send message">↑</button>
+    </form>
+
+    <div class="ecobot-footer">ÉCOLAB · LEARN BY UNDERSTANDING</div>
+  </section>
+
+</body>
+</html>

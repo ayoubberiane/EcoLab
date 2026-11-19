@@ -129,12 +129,19 @@ Your website will be published through GitHub Pages.
 ```text
 ecolab/
 │
-├── index.html
-├── style.css
-├── script.js
+├── index.html          # Home: live hero market, the three levels, overview
+├── simulator.html      # Market simulator with surplus, tax and elasticity
+├── calculators.html    # Six calculators with a level filter
+├── learn.html          # Concept library (opens ÉcoBot) and indicators
+├── quiz.html           # Knowledge check
+├── style.css           # Shared styles for every page
+├── script.js           # Shared script; each feature runs only where its page elements exist
 ├── README.md
 └── LICENSE
 ```
+
+Every page repeats the same header, footer and ÉcoBot markup. When you change
+the navigation or footer, update it in all five HTML files.
 
 ## 7. Educational Approach
 
