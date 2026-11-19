@@ -76,6 +76,9 @@ Available now:
 - **Knowledge Check:** A quiz across micro, meso, macro and statistics with worked explanations, a review of missed questions and a saved personal best.
 - **ÉcoBot:** A rule-based tutor that explains core concepts across all three levels.
 
+- **Five languages:** English, French, Arabic (right-to-left), Spanish and Portuguese, chosen from the header and remembered. Everything is translated, including calculator results, quiz questions and ÉcoBot's answers.
+- **Night mode:** a day/night switch in the header that follows the device setting until you pick one.
+
 In development:
 
 - **Data Visualization:** Explore economic relationships through more interactive graphs.
@@ -134,6 +137,7 @@ ecolab/
 ├── calculators.html    # Six calculators with a level filter
 ├── learn.html          # Concept library (opens ÉcoBot) and indicators
 ├── quiz.html           # Knowledge check
+├── lang/               # Translations: fr.js, ar.js, es.js, pt.js
 ├── style.css           # Shared styles for every page
 ├── script.js           # Shared script; each feature runs only where its page elements exist
 ├── README.md
@@ -142,6 +146,23 @@ ecolab/
 
 Every page repeats the same header, footer and ÉcoBot markup. When you change
 the navigation or footer, update it in all five HTML files.
+
+### Translations
+
+English is the source language: it lives in the HTML and in `script.js`.
+Each file in `lang/` maps an English string to its translation
+(`strings`), and also holds the translated quiz (`quiz`, in the same order as
+`QUIZ_QUESTIONS`), ÉcoBot's answers (`kb`) and extra words ÉcoBot should
+recognise (`keywords`). When you add or change English text, add the same
+English text as a key in each language file; anything without a translation
+simply stays in English.
+
+### Night mode
+
+The dark theme is a block of `:root[data-theme="dark"]` rules at the end of
+`style.css`. The first part was generated from the light theme; the
+hand-written fixes after it (buttons, form fields, Arabic layout) are the
+place to adjust specific components.
 
 ## 7. Educational Approach
 

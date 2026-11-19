@@ -10,6 +10,95 @@
 "use strict";
 
 /* =====================================================
+   0. TRANSLATION (i18n)
+   English is the source language: it lives in the HTML and
+   in this file. Each lang/xx.js registers
+     window.ECOLAB_L10N.xx = { strings, quiz, kb, keywords, ... }
+   where `strings` maps an English string to its translation.
+   The <head> loader sets <html lang/dir> and loads that file
+   before this script runs.
+===================================================== */
+
+const LANG = ["en", "fr", "ar", "es", "pt"].includes(document.documentElement.lang)
+  ? document.documentElement.lang
+  : "en";
+const L10N = (window.ECOLAB_L10N && window.ECOLAB_L10N[LANG]) || {};
+const STRINGS = L10N.strings || {};
+
+// Arabic UI uses Western digits and separators (as in Morocco and much of the
+// Maghreb); the "ar" locale would also insert invisible direction marks.
+const NUMBER_LOCALE = LANG === "ar" ? "en-US" : LANG;
+
+/**
+ * Translate an English string. Placeholders like {rate} are filled
+ * from `vars` after translation, so translators can reorder them.
+ */
+function t(english, vars) {
+  let text = Object.prototype.hasOwnProperty.call(STRINGS, english) ? STRINGS[english] : english;
+  if (vars) {
+    text = text.replace(/\{(\w+)\}/g, (match, key) => (key in vars ? isolateNumber(String(vars[key])) : match));
+    // Keep a trailing % inside the isolated number ("-22.22%", not "%-22.22").
+    text = text.replace(/\u2069(\s?%)/g, "$1\u2069");
+  }
+  return text;
+}
+
+// In right-to-left text, keep numbers like "-22.22" or "8%" in one piece.
+function isolateNumber(value) {
+  return document.documentElement.dir === "rtl" && /^[-−+]?[\d.,\s]+%?$/.test(value)
+    ? `\u2066${value}\u2069`
+    : value;
+}
+
+const collapse = text => text.replace(/\s+/g, " ").trim();
+
+const TRANSLATED_ATTRIBUTES = ["placeholder", "aria-label", "title", "alt", "data-question"];
+
+/** Replace English text nodes and attributes under `root` with translations. */
+function translateDOM(root = document.body) {
+  if (LANG === "en" || !root) return;
+
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      const parent = node.parentElement;
+      // Skip code, user-editable text, and the language list (always shown in its own language).
+      if (!parent || /^(SCRIPT|STYLE|TEXTAREA)$/.test(parent.tagName) || parent.closest("#langSelect")) {
+        return NodeFilter.FILTER_REJECT;
+      }
+      return node.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    }
+  });
+
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+
+  nodes.forEach(node => {
+    const key = collapse(node.nodeValue);
+    if (!Object.prototype.hasOwnProperty.call(STRINGS, key)) return;
+    const lead = node.nodeValue.match(/^\s*/)[0] ? " " : "";
+    const trail = node.nodeValue.match(/\s*$/)[0] ? " " : "";
+    node.nodeValue = lead + STRINGS[key] + trail;
+  });
+
+  const scope = root === document.body ? document : root;
+  TRANSLATED_ATTRIBUTES.forEach(attribute => {
+    scope.querySelectorAll(`[${attribute}]`).forEach(element => {
+      const key = collapse(element.getAttribute(attribute));
+      if (Object.prototype.hasOwnProperty.call(STRINGS, key)) element.setAttribute(attribute, STRINGS[key]);
+    });
+  });
+
+  if (root === document.body) {
+    document.title = t(document.title);
+    const description = document.querySelector('meta[name="description"]');
+    if (description) description.setAttribute("content", t(description.getAttribute("content")));
+  }
+}
+
+translateDOM();
+
+
+/* =====================================================
    1. GENERAL UTILITIES
 ===================================================== */
 
@@ -17,7 +106,7 @@ const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 
 function formatNumber(value, digits = 2) {
-  return Number(value).toLocaleString(undefined, {
+  return Number(value).toLocaleString(NUMBER_LOCALE, {
     maximumFractionDigits: digits,
     minimumFractionDigits: 0
   });
@@ -69,6 +158,88 @@ if (menuToggle && mainNav) {
 const yearElement = $("#currentYear");
 if (yearElement) {
   yearElement.textContent = new Date().getFullYear();
+}
+
+/* =====================================================
+   2a. THEME (NIGHT MODE) AND LANGUAGE SWITCHERS
+   The <head> loader already applied the saved/system
+   choices before first paint; these only handle changes.
+===================================================== */
+
+const themeToggle = $("#themeToggle");
+const rootElement = document.documentElement;
+
+function currentTheme() {
+  return rootElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+}
+
+function labelThemeToggle() {
+  if (!themeToggle) return;
+  const label = currentTheme() === "dark" ? t("Switch to day mode") : t("Switch to night mode");
+  themeToggle.setAttribute("aria-label", label);
+  themeToggle.title = label;
+}
+
+function applyTheme(theme) {
+  rootElement.setAttribute("data-theme", theme);
+  labelThemeToggle();
+  // The simulator canvas has fixed colours, but redraw anyway in case sizes shift.
+  if (typeof marketState !== "undefined" && marketState) drawMarketChart(marketState);
+}
+
+if (themeToggle) {
+  labelThemeToggle();
+
+  themeToggle.addEventListener("click", () => {
+    const next = currentTheme() === "dark" ? "light" : "dark";
+
+    try { localStorage.setItem("ecolab-theme", next); } catch { /* private mode */ }
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (!document.startViewTransition || reduce) {
+      applyTheme(next);
+      return;
+    }
+
+    // Grow the new theme out of the button as a circle.
+    const rect = themeToggle.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+
+    rootElement.style.setProperty("--reveal-x", `${x}px`);
+    rootElement.style.setProperty("--reveal-y", `${y}px`);
+    rootElement.style.setProperty("--reveal-r", `${radius}px`);
+    rootElement.classList.add("theme-transition");
+
+    const transition = document.startViewTransition(() => applyTheme(next));
+    transition.finished.finally(() => rootElement.classList.remove("theme-transition"));
+  });
+}
+
+// Follow the system setting live, unless the visitor picked a theme.
+if (window.matchMedia) {
+  const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+  const onSystemChange = event => {
+    let saved = null;
+    try { saved = localStorage.getItem("ecolab-theme"); } catch { /* ignore */ }
+    if (saved !== "light" && saved !== "dark") applyTheme(event.matches ? "dark" : "light");
+  };
+  systemDark.addEventListener?.("change", onSystemChange);
+}
+
+const langSelect = $("#langSelect");
+
+if (langSelect) {
+  langSelect.value = LANG;
+  langSelect.setAttribute("aria-label", t("Language"));
+
+  langSelect.addEventListener("change", () => {
+    try { localStorage.setItem("ecolab-lang", langSelect.value); } catch { /* private mode */ }
+    // Reload so the head loader can switch direction, fonts and strings before paint.
+    window.location.reload();
+  });
 }
 
 /* =====================================================
@@ -154,11 +325,11 @@ if (heroSvg) {
   function frame(now) {
     if (!running) return;
     if (start === null) start = now;
-    const t = (now - start) / 1000;
+    const elapsed = (now - start) / 1000;
 
     // Demand shifts on a ~9s cycle, supply on a ~13s cycle.
-    const dShift = 32 * Math.sin(t * 0.7);
-    const sShift = 24 * Math.sin(t * 0.48 + 1.3);
+    const dShift = 32 * Math.sin(elapsed * 0.7);
+    const sShift = 24 * Math.sin(elapsed * 0.48 + 1.3);
 
     demandPath.setAttribute("d", `M${X0} ${65 + dShift} L${X1} ${270 + dShift}`);
     supplyPath.setAttribute("d", `M${X0} ${270 + sShift} L${X1} ${65 + sShift}`);
@@ -186,8 +357,8 @@ if (heroSvg) {
     }
 
     if (status) {
-      const trend = Math.cos(t * 0.7);
-      status.textContent = trend > 0.3 ? "DEMAND FALLING" : trend < -0.3 ? "DEMAND RISING" : "LIVE MARKET";
+      const trend = Math.cos(elapsed * 0.7);
+      status.textContent = t(trend > 0.3 ? "DEMAND FALLING" : trend < -0.3 ? "DEMAND RISING" : "LIVE MARKET");
     }
 
     requestAnimationFrame(frame);
@@ -411,8 +582,8 @@ function updateMarket() {
   if (demandValue) demandValue.textContent = state.demandIntensity;
   if (supplyValue) supplyValue.textContent = state.supplyIntensity;
   if (taxValue) taxValue.textContent = state.tax;
-  if (demandSlopeValue) demandSlopeValue.textContent = ELASTICITY_LABELS[state.demandLevel - 1];
-  if (supplySlopeValue) supplySlopeValue.textContent = ELASTICITY_LABELS[state.supplyLevel - 1];
+  if (demandSlopeValue) demandSlopeValue.textContent = t(ELASTICITY_LABELS[state.demandLevel - 1]);
+  if (supplySlopeValue) supplySlopeValue.textContent = t(ELASTICITY_LABELS[state.supplyLevel - 1]);
 
   if (buyerPriceOutput) {
     buyerPriceOutput.textContent = state.noTrade ? "—" : formatNumber(state.buyerPrice);
@@ -449,36 +620,41 @@ function updateMarketExplanation(state) {
 
   if (state.noTrade) {
     message = state.tax > 0 && state.baseQuantity > 0
-      ? `At a tax of ${state.tax}, the highest price any buyer will pay is below the lowest price any seller will accept plus the tax. The market shuts down entirely: all potential gains from trade (${formatNumber(state.deadweightLoss, 1)}) are lost as deadweight loss.`
-      : "Even the most eager buyer values the good less than the lowest-cost seller can produce it, so no trade takes place.";
+      ? t("At a tax of {tax}, the highest price any buyer will pay is below the lowest price any seller will accept plus the tax. The market shuts down entirely: all potential gains from trade ({loss}) are lost as deadweight loss.",
+        { tax: formatNumber(state.tax), loss: formatNumber(state.deadweightLoss, 1) })
+      : t("Even the most eager buyer values the good less than the lowest-cost seller can produce it, so no trade takes place.");
   } else if (state.tax > 0) {
     const buyerShare = state.buyerPrice - state.basePrice;
     const sellerShare = state.basePrice - state.sellerPrice;
 
-    message =
-      `A per-unit tax of ${state.tax} drives a wedge between the price buyers pay (${formatNumber(state.buyerPrice)}) and the price sellers keep (${formatNumber(state.sellerPrice)}). ` +
-      `Buyers bear ${formatNumber(buyerShare)} and sellers ${formatNumber(sellerShare)} of it` +
-      (Math.abs(buyerShare - sellerShare) < 0.05
-        ? " — an even split, because both sides are equally responsive to price. "
-        : buyerShare > sellerShare
-          ? " — buyers carry more because demand is less elastic than supply. "
-          : " — sellers carry more because supply is less elastic than demand. ") +
-      `Quantity falls from ${formatNumber(state.baseQuantity)} to ${formatNumber(state.quantity)}; the government collects ${formatNumber(state.taxRevenue, 1)}, but ${formatNumber(state.deadweightLoss, 1)} of surplus simply disappears — the deadweight loss.`;
+    const incidence = Math.abs(buyerShare - sellerShare) < 0.05
+      ? "Buyers bear {buyer} and sellers {seller} of it — an even split, because both sides are equally responsive to price."
+      : buyerShare > sellerShare
+        ? "Buyers bear {buyer} and sellers {seller} of it — buyers carry more because demand is less elastic than supply."
+        : "Buyers bear {buyer} and sellers {seller} of it — sellers carry more because supply is less elastic than demand.";
+
+    message = [
+      t("A per-unit tax of {tax} drives a wedge between the price buyers pay ({pb}) and the price sellers keep ({ps}).",
+        { tax: formatNumber(state.tax), pb: formatNumber(state.buyerPrice), ps: formatNumber(state.sellerPrice) }),
+      t(incidence, { buyer: formatNumber(buyerShare), seller: formatNumber(sellerShare) }),
+      t("Quantity falls from {q0} to {q1}; the government collects {revenue}, but {loss} of surplus simply disappears — the deadweight loss.",
+        { q0: formatNumber(state.baseQuantity), q1: formatNumber(state.quantity), revenue: formatNumber(state.taxRevenue, 1), loss: formatNumber(state.deadweightLoss, 1) })
+    ].join(" ");
   } else if (state.demandIntensity > 55) {
     message =
-      "Demand is relatively strong. In this model, the equilibrium price and quantity rise as demand increases, holding supply conditions constant.";
+      t("Demand is relatively strong. In this model, the equilibrium price and quantity rise as demand increases, holding supply conditions constant.");
   } else if (state.demandIntensity < 45) {
     message =
-      "Demand is relatively weak. The market adjusts toward a lower equilibrium price and quantity, holding supply conditions constant.";
+      t("Demand is relatively weak. The market adjusts toward a lower equilibrium price and quantity, holding supply conditions constant.");
   } else if (state.supplyIntensity > 55) {
     message =
-      "Supply is relatively strong. More goods are available at each price, putting downward pressure on equilibrium price and increasing equilibrium quantity.";
+      t("Supply is relatively strong. More goods are available at each price, putting downward pressure on equilibrium price and increasing equilibrium quantity.");
   } else if (state.supplyIntensity < 45) {
     message =
-      "Supply is relatively constrained. Equilibrium price tends to rise while equilibrium quantity falls.";
+      t("Supply is relatively constrained. Equilibrium price tends to rise while equilibrium quantity falls.");
   } else {
     message =
-      "The market is close to its baseline conditions. Change demand, supply or tax to see how equilibrium responds.";
+      t("The market is close to its baseline conditions. Change demand, supply or tax to see how equilibrium responds.");
   }
 
   marketExplanation.textContent = message;
@@ -697,10 +873,10 @@ function drawMarketChart(state) {
   ctx.fillStyle = "#a1b2a4";
   ctx.font = '11px "DM Mono", monospace';
   ctx.textAlign = "left";
-  ctx.fillText("PRICE", margin.left, 10);
+  ctx.fillText(t("PRICE"), margin.left, 10);
 
   ctx.textAlign = "right";
-  ctx.fillText("QUANTITY", width - margin.right, height - 3);
+  ctx.fillText(t("QUANTITY"), width - margin.right, height - 3);
 
   // Curve labels at the end of each line
   ctx.font = '12px "DM Mono", monospace';
@@ -713,13 +889,13 @@ function drawMarketChart(state) {
     ctx.fillText(text, lx, y(end[1]) + dy);
   };
 
-  labelAt(demandEnd, "D", MARKET_COLORS.demand, -4);
-  labelAt(supplyEnd, "S", MARKET_COLORS.supply, 12);
+  labelAt(demandEnd, t("D"), MARKET_COLORS.demand, -4);
+  labelAt(supplyEnd, t("S"), MARKET_COLORS.supply, 12);
   // The taxed supply label sits just left of its line end so it never collides with "S".
   if (taxEnd) {
     ctx.fillStyle = MARKET_COLORS.tax;
     ctx.textAlign = "right";
-    ctx.fillText("S + TAX", x(taxEnd[0]) - 6, Math.max(margin.top + 8, y(taxEnd[1]) - 6));
+    ctx.fillText(t("S + TAX"), x(taxEnd[0]) - 6, Math.max(margin.top + 8, y(taxEnd[1]) - 6));
   }
 }
 
@@ -760,12 +936,12 @@ if (elasticityButton) {
     const q2 = readNumber("q2");
 
     if (![p1, p2, q1, q2].every(Number.isFinite)) {
-      showResult("elasticityResult", "Please enter valid numbers in all fields.", true);
+      showResult("elasticityResult", t("Please enter valid numbers in all fields."), true);
       return;
     }
 
     if (p1 <= 0 || p2 <= 0 || q1 <= 0 || q2 <= 0) {
-      showResult("elasticityResult", "Prices and quantities must be greater than zero.", true);
+      showResult("elasticityResult", t("Prices and quantities must be greater than zero."), true);
       return;
     }
 
@@ -776,7 +952,7 @@ if (elasticityButton) {
     const percentagePrice = (p2 - p1) / averagePrice;
 
     if (percentagePrice === 0) {
-      showResult("elasticityResult", "Price did not change. Elasticity cannot be calculated with this input.", true);
+      showResult("elasticityResult", t("Price did not change. Elasticity cannot be calculated with this input."), true);
       return;
     }
 
@@ -786,21 +962,26 @@ if (elasticityButton) {
     let interpretation;
 
     if (Math.abs(absolutePED - 1) < 0.000001) {
-      interpretation = "Unit elastic demand";
+      interpretation = t("Unit elastic demand");
     } else if (absolutePED > 1) {
-      interpretation = "Elastic demand";
+      interpretation = t("Elastic demand");
     } else {
-      interpretation = "Inelastic demand";
+      interpretation = t("Inelastic demand");
     }
 
-    const result =
-      `PRICE ELASTICITY OF DEMAND\n\n` +
-      `Percentage change in quantity: ${formatNumber(percentageQuantity * 100)}%\n` +
-      `Percentage change in price: ${formatNumber(percentagePrice * 100)}%\n\n` +
-      `PED = ${formatNumber(ped, 4)}\n` +
-      `Absolute PED = ${formatNumber(absolutePED, 4)}\n\n` +
-      `Interpretation: ${interpretation}.\n\n` +
-      `The absolute value tells us how responsive quantity demanded is to a price change.`;
+    const result = [
+      t("PRICE ELASTICITY OF DEMAND"),
+      "",
+      t("Percentage change in quantity: {value}%", { value: formatNumber(percentageQuantity * 100) }),
+      t("Percentage change in price: {value}%", { value: formatNumber(percentagePrice * 100) }),
+      "",
+      t("PED = {value}", { value: formatNumber(ped, 4) }),
+      t("Absolute PED = {value}", { value: formatNumber(absolutePED, 4) }),
+      "",
+      t("Interpretation: {value}.", { value: interpretation }),
+      "",
+      t("The absolute value tells us how responsive quantity demanded is to a price change.")
+    ].join("\n");
 
     showResult("elasticityResult", result);
   });
@@ -821,23 +1002,27 @@ if (gdpButton) {
     const M = readNumber("gdpM");
 
     if (![C, I, G, X, M].every(Number.isFinite)) {
-      showResult("gdpResult", "Please complete all five fields with valid numbers.", true);
+      showResult("gdpResult", t("Please complete all five fields with valid numbers."), true);
       return;
     }
 
     const netExports = X - M;
     const gdp = C + I + G + netExports;
 
-    const result =
-      `GDP EXPENDITURE APPROACH\n\n` +
-      `Consumption: ${formatNumber(C)}\n` +
-      `Investment: ${formatNumber(I)}\n` +
-      `Government purchases: ${formatNumber(G)}\n` +
-      `Exports: ${formatNumber(X)}\n` +
-      `Imports: ${formatNumber(M)}\n\n` +
-      `Net exports = X − M = ${formatNumber(netExports)}\n\n` +
-      `GDP = C + I + G + (X − M)\n` +
-      `GDP = ${formatNumber(gdp)} monetary units.`;
+    const result = [
+      t("GDP EXPENDITURE APPROACH"),
+      "",
+      t("Consumption: {value}", { value: formatNumber(C) }),
+      t("Investment: {value}", { value: formatNumber(I) }),
+      t("Government purchases: {value}", { value: formatNumber(G) }),
+      t("Exports: {value}", { value: formatNumber(X) }),
+      t("Imports: {value}", { value: formatNumber(M) }),
+      "",
+      t("Net exports = X − M = {value}", { value: formatNumber(netExports) }),
+      "",
+      t("GDP = C + I + G + (X − M)"),
+      t("GDP = {value} monetary units.", { value: formatNumber(gdp) })
+    ].join("\n");
 
     showResult("gdpResult", result);
   });
@@ -862,7 +1047,7 @@ if (hhiButton) {
       shares.length < 2 ||
       shares.some(value => !Number.isFinite(value) || value < 0 || value > 100)
     ) {
-      showResult("hhiResult", "Enter at least two valid market shares between 0 and 100.", true);
+      showResult("hhiResult", t("Enter at least two valid market shares between 0 and 100."), true);
       return;
     }
 
@@ -871,7 +1056,7 @@ if (hhiButton) {
     if (Math.abs(totalShare - 100) > 0.01) {
       showResult(
         "hhiResult",
-        `Your market shares total ${formatNumber(totalShare)}%, not 100%. Please correct the entries.`,
+        t("Your market shares total {value}%, not 100%. Please correct the entries.", { value: formatNumber(totalShare) }),
         true
       );
       return;
@@ -882,20 +1067,25 @@ if (hhiButton) {
     let interpretation;
 
     if (hhi < 1500) {
-      interpretation = "Relatively low concentration under one commonly used US screening framework.";
+      interpretation = t("Relatively low concentration under one commonly used US screening framework.");
     } else if (hhi < 2500) {
-      interpretation = "Moderate concentration under one commonly used US screening framework.";
+      interpretation = t("Moderate concentration under one commonly used US screening framework.");
     } else {
-      interpretation = "High concentration under one commonly used US screening framework.";
+      interpretation = t("High concentration under one commonly used US screening framework.");
     }
 
-    const result =
-      `MARKET CONCENTRATION\n\n` +
-      `Market shares: ${shares.join("%, ")}%\n\n` +
-      `HHI = ${shares.map(value => `${value}²`).join(" + ")}\n` +
-      `HHI = ${formatNumber(hhi, 0)}\n\n` +
-      `${interpretation}\n\n` +
-      `Note: Regulatory thresholds vary by jurisdiction and framework.`;
+    const result = [
+      t("MARKET CONCENTRATION"),
+      "",
+      t("Market shares: {value}", { value: shares.map(value => `${formatNumber(value)}%`).join(", ") }),
+      "",
+      `HHI = ${shares.map(value => `${formatNumber(value)}²`).join(" + ")}`,
+      `HHI = ${formatNumber(hhi, 0)}`,
+      "",
+      interpretation,
+      "",
+      t("Note: Regulatory thresholds vary by jurisdiction and framework.")
+    ].join("\n");
 
     showResult("hhiResult", result);
   });
@@ -969,7 +1159,7 @@ if (statsButton) {
       values.length === 0 ||
       values.some(value => !Number.isFinite(value))
     ) {
-      showResult("statsResult", "Please enter a valid numerical dataset.", true);
+      showResult("statsResult", t("Please enter a valid numerical dataset."), true);
       return;
     }
 
@@ -993,27 +1183,33 @@ if (statsButton) {
     const sampleVariance = n > 1 ? squaredDeviations / (n - 1) : NaN;
     const sampleSD = Math.sqrt(sampleVariance);
     const cv = mean !== 0 ? (sampleSD / Math.abs(mean)) * 100 : NaN;
-    const show = value => Number.isFinite(value) ? formatNumber(value) : "n/a (needs 2+ values)";
+    const show = value => Number.isFinite(value) ? formatNumber(value) : t("n/a (needs 2+ values)");
 
-    const result =
-      `DESCRIPTIVE STATISTICS\n\n` +
-      `Observations: ${n}\n` +
-      `Sum: ${formatNumber(sum)}\n` +
-      `Mean: ${formatNumber(mean)}\n` +
-      `Median: ${formatNumber(median)}\n` +
-      `Mode: ${modes.length ? modes.map(formatNumber).join(", ") : "No mode"}\n\n` +
-      `Minimum: ${formatNumber(minimum)}\n` +
-      `Maximum: ${formatNumber(maximum)}\n` +
-      `Range: ${formatNumber(range)}\n\n` +
-      `First quartile (Q1): ${formatNumber(q1)}\n` +
-      `Third quartile (Q3): ${formatNumber(q3)}\n` +
-      `Interquartile range: ${formatNumber(iqr)}\n\n` +
-      `Population variance (σ²): ${formatNumber(populationVariance)}\n` +
-      `Population std. deviation (σ): ${formatNumber(Math.sqrt(populationVariance))}\n` +
-      `Sample variance (s²): ${show(sampleVariance)}\n` +
-      `Sample std. deviation (s): ${show(sampleSD)}\n` +
-      `Coefficient of variation: ${Number.isFinite(cv) ? formatNumber(cv) + "%" : "n/a"}\n\n` +
-      `Quartile method: median of the lower and upper halves.`;
+    const result = [
+      t("DESCRIPTIVE STATISTICS"),
+      "",
+      t("Observations: {value}", { value: n }),
+      t("Sum: {value}", { value: formatNumber(sum) }),
+      t("Mean: {value}", { value: formatNumber(mean) }),
+      t("Median: {value}", { value: formatNumber(median) }),
+      t("Mode: {value}", { value: modes.length ? modes.map(value => formatNumber(value)).join(", ") : t("No mode") }),
+      "",
+      t("Minimum: {value}", { value: formatNumber(minimum) }),
+      t("Maximum: {value}", { value: formatNumber(maximum) }),
+      t("Range: {value}", { value: formatNumber(range) }),
+      "",
+      t("First quartile (Q1): {value}", { value: formatNumber(q1) }),
+      t("Third quartile (Q3): {value}", { value: formatNumber(q3) }),
+      t("Interquartile range: {value}", { value: formatNumber(iqr) }),
+      "",
+      t("Population variance (σ²): {value}", { value: formatNumber(populationVariance) }),
+      t("Population std. deviation (σ): {value}", { value: formatNumber(Math.sqrt(populationVariance)) }),
+      t("Sample variance (s²): {value}", { value: show(sampleVariance) }),
+      t("Sample std. deviation (s): {value}", { value: show(sampleSD) }),
+      t("Coefficient of variation: {value}", { value: Number.isFinite(cv) ? formatNumber(cv) + "%" : t("n/a") }),
+      "",
+      t("Quartile method: median of the lower and upper halves.")
+    ].join("\n");
 
     showResult("statsResult", result);
   });
@@ -1032,26 +1228,31 @@ if (inflationButton) {
     const nominal = readNumber("nominalValue");
 
     if (![oldCPI, newCPI].every(Number.isFinite) || oldCPI <= 0 || newCPI <= 0) {
-      showResult("inflationResult", "Enter two positive price index values.", true);
+      showResult("inflationResult", t("Enter two positive price index values."), true);
       return;
     }
 
     const rate = ((newCPI - oldCPI) / oldCPI) * 100;
-    let text =
-      `INFLATION RATE\n\n` +
-      `Inflation = (${formatNumber(newCPI)} − ${formatNumber(oldCPI)}) / ${formatNumber(oldCPI)} × 100\n` +
-      `Inflation = ${formatNumber(rate)}%\n\n`;
+    let text = [
+      t("INFLATION RATE"),
+      "",
+      t("Inflation = ({new} − {old}) / {old} × 100", { new: formatNumber(newCPI), old: formatNumber(oldCPI) }),
+      t("Inflation = {value}%", { value: formatNumber(rate) }),
+      "",
+      ""
+    ].join("\n");
 
-    if (rate > 0) text += `Prices rose: the same basket now costs ${formatNumber(rate)}% more.`;
-    else if (rate < 0) text += `Prices fell: this is deflation of ${formatNumber(Math.abs(rate))}%.`;
-    else text += "The price level is unchanged.";
+    if (rate > 0) text += t("Prices rose: the same basket now costs {value}% more.", { value: formatNumber(rate) });
+    else if (rate < 0) text += t("Prices fell: this is deflation of {value}%.", { value: formatNumber(Math.abs(rate)) });
+    else text += t("The price level is unchanged.");
 
     if (Number.isFinite(nominal)) {
       const real = nominal * (oldCPI / newCPI);
-      text +=
-        `\n\nPURCHASING POWER\n` +
-        `${formatNumber(nominal)} today buys what ${formatNumber(real)} bought in the base period.\n` +
-        `Real value = Nominal × (Old CPI / New CPI)`;
+      text += "\n\n" + [
+        t("PURCHASING POWER"),
+        t("{nominal} today buys what {real} bought in the base period.", { nominal: formatNumber(nominal), real: formatNumber(real) }),
+        t("Real value = Nominal × (Old CPI / New CPI)")
+      ].join("\n");
     }
 
     showResult("inflationResult", text);
@@ -1070,29 +1271,33 @@ if (unemploymentButton) {
       ![employed, unemployed].every(Number.isFinite) ||
       employed < 0 || unemployed < 0 || employed + unemployed === 0
     ) {
-      showResult("unemploymentResult", "Enter non-negative numbers for employed and unemployed people.", true);
+      showResult("unemploymentResult", t("Enter non-negative numbers for employed and unemployed people."), true);
       return;
     }
 
     const labourForce = employed + unemployed;
     const rate = (unemployed / labourForce) * 100;
 
-    let text =
-      `LABOUR MARKET\n\n` +
-      `Labour force = ${formatNumber(employed)} + ${formatNumber(unemployed)} = ${formatNumber(labourForce)}\n\n` +
-      `Unemployment rate = ${formatNumber(unemployed)} / ${formatNumber(labourForce)} × 100\n` +
-      `Unemployment rate = ${formatNumber(rate)}%`;
+    let text = [
+      t("LABOUR MARKET"),
+      "",
+      t("Labour force = {employed} + {unemployed} = {total}", { employed: formatNumber(employed), unemployed: formatNumber(unemployed), total: formatNumber(labourForce) }),
+      "",
+      t("Unemployment rate = {unemployed} / {total} × 100", { unemployed: formatNumber(unemployed), total: formatNumber(labourForce) }),
+      t("Unemployment rate = {value}%", { value: formatNumber(rate) })
+    ].join("\n");
 
     if (Number.isFinite(population)) {
       if (population < labourForce) {
-        showResult("unemploymentResult", "Working-age population cannot be smaller than the labour force.", true);
+        showResult("unemploymentResult", t("Working-age population cannot be smaller than the labour force."), true);
         return;
       }
 
-      text +=
-        `\n\nParticipation rate = ${formatNumber((labourForce / population) * 100)}%\n` +
-        `Employment rate = ${formatNumber((employed / population) * 100)}%\n` +
-        `Outside the labour force: ${formatNumber(population - labourForce)}`;
+      text += "\n\n" + [
+        t("Participation rate = {value}%", { value: formatNumber((labourForce / population) * 100) }),
+        t("Employment rate = {value}%", { value: formatNumber((employed / population) * 100) }),
+        t("Outside the labour force: {value}", { value: formatNumber(population - labourForce) })
+      ].join("\n");
     }
 
     showResult("unemploymentResult", text);
@@ -1264,6 +1469,12 @@ const QUIZ_QUESTIONS = [
   }
 ];
 
+// Translated questions keep the English option order, so `answer` still applies.
+const LOCAL_QUIZ = QUIZ_QUESTIONS.map((question, index) => ({
+  ...question,
+  ...((L10N.quiz && L10N.quiz[index]) || {})
+}));
+
 const QUIZ_LEVEL_NAMES = {
   all: "All levels",
   micro: "Micro",
@@ -1309,7 +1520,7 @@ function shuffle(items) {
 }
 
 function startQuiz(level = "all") {
-  const pool = QUIZ_QUESTIONS.filter(q => level === "all" || q.level === level);
+  const pool = LOCAL_QUIZ.filter(q => level === "all" || q.level === level);
   const questions = shuffle(pool)
     .slice(0, level === "all" ? 10 : pool.length)
     .map(question => {
@@ -1340,6 +1551,10 @@ function el(tag, className, text) {
   return node;
 }
 
+function quizProgressText(current, total, score) {
+  return t("QUESTION {current} / {total} · SCORE {score}", { current, total, score });
+}
+
 function renderQuestion() {
   if (!quizRoot || !quizState) return;
 
@@ -1350,8 +1565,8 @@ function renderQuestion() {
 
   const meta = el("div", "quiz-meta");
   meta.append(
-    el("span", "quiz-level", QUIZ_LEVEL_NAMES[question.level].toUpperCase()),
-    el("span", "quiz-progress-text", `QUESTION ${index + 1} / ${questions.length} · SCORE ${score}`)
+    el("span", "quiz-level", t(QUIZ_LEVEL_NAMES[question.level]).toLocaleUpperCase(LANG)),
+    el("span", "quiz-progress-text", quizProgressText(index + 1, questions.length, score))
   );
 
   const bar = el("div", "quiz-progress");
@@ -1363,7 +1578,7 @@ function renderQuestion() {
 
   const options = el("div", "quiz-options");
   options.setAttribute("role", "group");
-  options.setAttribute("aria-label", "Answer options");
+  options.setAttribute("aria-label", t("Answer options"));
 
   question.options.forEach((text, optionIndex) => {
     const button = el("button", "quiz-option");
@@ -1400,14 +1615,14 @@ function answerQuestion(choice) {
 
   const feedback = quizRoot.querySelector(".quiz-feedback");
   feedback.replaceChildren(
-    el("strong", correct ? "is-correct" : "is-incorrect", correct ? "✓ Correct" : "✗ Not quite"),
+    el("strong", correct ? "is-correct" : "is-incorrect", correct ? t("✓ Correct") : t("✗ Not quite")),
     el("p", "", question.explanation)
   );
 
   const isLast = quizState.index === quizState.questions.length - 1;
   const next = el("button", "button button-dark quiz-next");
   next.type = "button";
-  next.append(isLast ? "See results " : "Next question ", el("span", "", "→"));
+  next.append(t(isLast ? "See results" : "Next question") + " ", el("span", "", "→"));
   next.addEventListener("click", () => {
     if (isLast) {
       renderResults();
@@ -1423,7 +1638,7 @@ function answerQuestion(choice) {
   next.focus();
 
   quizRoot.querySelector(".quiz-progress-text").textContent =
-    `QUESTION ${quizState.index + 1} / ${quizState.questions.length} · SCORE ${quizState.score}`;
+    quizProgressText(quizState.index + 1, quizState.questions.length, quizState.score);
 }
 
 function renderResults() {
@@ -1434,37 +1649,37 @@ function renderResults() {
   saveBestScore(level, percent);
 
   let verdict;
-  if (percent === 100) verdict = "Perfect score. You think like an economist.";
-  else if (percent >= 70) verdict = "Strong result. Review the questions below to close the gaps.";
-  else if (percent >= 40) verdict = "Good start. Revisit the topics below and try again.";
-  else verdict = "Keep experimenting. The simulator, calculators and ÉcoBot can help.";
+  if (percent === 100) verdict = t("Perfect score. You think like an economist.");
+  else if (percent >= 70) verdict = t("Strong result. Review the questions below to close the gaps.");
+  else if (percent >= 40) verdict = t("Good start. Revisit the topics below and try again.");
+  else verdict = t("Keep experimenting. The simulator, calculators and ÉcoBot can help.");
 
   quizRoot.replaceChildren();
 
   const header = el("div", "quiz-result-header");
   header.append(
-    el("span", "quiz-level", `${QUIZ_LEVEL_NAMES[level].toUpperCase()} · RESULTS`),
+    el("span", "quiz-level", t("{level} · RESULTS", { level: t(QUIZ_LEVEL_NAMES[level]) }).toLocaleUpperCase(LANG)),
     el("div", "quiz-score", `${score} / ${questions.length}`),
     el("p", "quiz-verdict", verdict)
   );
 
   if (previousBest !== undefined) {
     header.appendChild(el("p", "quiz-best", percent > previousBest
-      ? `New personal best! (previous: ${previousBest}%)`
-      : `Your best on this set: ${previousBest}%`));
+      ? t("New personal best! (previous: {value}%)", { value: previousBest })
+      : t("Your best on this set: {value}%", { value: previousBest })));
   }
 
   quizRoot.appendChild(header);
 
   if (missed.length) {
     const review = el("div", "quiz-review");
-    review.appendChild(el("span", "quiz-review-title", "REVIEW"));
+    review.appendChild(el("span", "quiz-review-title", t("REVIEW")));
 
     missed.forEach(question => {
       const item = el("div", "quiz-review-item");
       item.append(
         el("strong", "", question.prompt),
-        el("p", "", `Answer: ${question.options[question.answer]}. ${question.explanation}`)
+        el("p", "", t("Answer: {answer}. {explanation}", { answer: question.options[question.answer], explanation: question.explanation }))
       );
       review.appendChild(item);
     });
@@ -1474,7 +1689,7 @@ function renderResults() {
 
   const restart = el("button", "button button-dark quiz-next");
   restart.type = "button";
-  restart.append("Try again ", el("span", "", "↺"));
+  restart.append(t("Try again") + " ", el("span", "", "↺"));
   restart.addEventListener("click", () => startQuiz(level));
   quizRoot.appendChild(restart);
 }
@@ -2234,12 +2449,33 @@ function escapeRegExp(value) {
 
 // Pre-compile word-boundary regexes (allowing simple plurals) so that,
 // for example, "ped" does not match "speed" and "mean" does not match "meaning".
+/**
+ * Normalise text for matching: lower case, no accents (é → e) and, for
+ * Arabic, no short vowels and unified alef / yaa / taa marbuta forms.
+ */
+function normalizeForMatch(text) {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Mn}/gu, "")
+    .replace(/[أإآ]/g, "ا")
+    .replace(/ى/g, "ي")
+    .replace(/ة/g, "ه")
+    .replace(/[’‘`´]/g, "'");
+}
+
+// Latin keywords match whole words (allowing simple plurals). Arabic keywords
+// match anywhere, because Arabic attaches prefixes such as ال (the) to words.
 const TOPIC_MATCHERS = TOPIC_PATTERNS.map(pattern => ({
   ...pattern,
-  regexes: pattern.keys.map(keyword => ({
-    keyword,
-    regex: new RegExp(`\\b${escapeRegExp(keyword)}(?:s|es)?\\b`, "i")
-  }))
+  regexes: [...pattern.keys, ...((L10N.keywords && L10N.keywords[pattern.key]) || [])].map(raw => {
+    const keyword = normalizeForMatch(raw);
+    const body = escapeRegExp(keyword);
+    const regex = /[a-z]/.test(keyword)
+      ? new RegExp(`(?<![\\p{L}\\p{N}])${body}(?:s|es)?(?![\\p{L}\\p{N}])`, "u")
+      : new RegExp(body, "u");
+    return { keyword, regex };
+  })
 }));
 
 const DOMAIN_TOPICS = {
@@ -2252,6 +2488,8 @@ const DOMAIN_TOPICS = {
 function matchTopic(question, domain = "general") {
   let best = null;
   let bestScore = 0;
+
+  question = normalizeForMatch(question);
 
   TOPIC_MATCHERS.forEach(pattern => {
     // Score by the longest matching keyword: longer phrases are more specific.
@@ -2285,44 +2523,51 @@ function answerEcoBot(question) {
   // Example: Calculate GDP C=500 I=150 G=200 X=120 M=90
 
   const gdpMatch = q.match(
-    /(?:calculate|compute|find)\s+gdp[\s\S]*?c\s*=?\s*(-?\d+(?:\.\d+)?)[\s\S]*?i\s*=?\s*(-?\d+(?:\.\d+)?)[\s\S]*?g\s*=?\s*(-?\d+(?:\.\d+)?)[\s\S]*?x\s*=?\s*(-?\d+(?:\.\d+)?)[\s\S]*?m\s*=?\s*(-?\d+(?:\.\d+)?)/
+    /(?:calculate|compute|find|calculer|calcule|calcular|calcula|احسب)\s+(?:the\s+|le\s+|el\s+|o\s+)?(?:gdp|pib|الناتج)[\s\S]*?c\s*=?\s*(-?\d+(?:\.\d+)?)[\s\S]*?i\s*=?\s*(-?\d+(?:\.\d+)?)[\s\S]*?g\s*=?\s*(-?\d+(?:\.\d+)?)[\s\S]*?x\s*=?\s*(-?\d+(?:\.\d+)?)[\s\S]*?m\s*=?\s*(-?\d+(?:\.\d+)?)/
   );
 
   if (gdpMatch) {
     const [, C, I, G, X, M] = gdpMatch.map(Number);
     const result = C + I + G + X - M;
 
-    return (
-      `LET'S SOLVE THIS STEP BY STEP\n\n` +
-      `1. GDP = C + I + G + (X − M)\n\n` +
-      `2. Substitute the values:\n` +
-      `GDP = ${C} + ${I} + ${G} + (${X} − ${M})\n\n` +
-      `3. Calculate net exports:\n` +
-      `X − M = ${X - M}\n\n` +
-      `4. Final result:\n` +
-      `GDP = ${formatNumber(result)} monetary units.\n\n` +
-      `That's your answer!`
-    );
+    return [
+      t("LET'S SOLVE THIS STEP BY STEP"),
+      "",
+      t("1. GDP = C + I + G + (X − M)"),
+      "",
+      t("2. Substitute the values:"),
+      t("GDP = {c} + {i} + {g} + ({x} − {m})", { c: C, i: I, g: G, x: X, m: M }),
+      "",
+      t("3. Calculate net exports:"),
+      `X − M = ${formatNumber(X - M)}`,
+      "",
+      t("4. Final result:"),
+      t("GDP = {value} monetary units.", { value: formatNumber(result) }),
+      "",
+      t("That's your answer!")
+    ].join("\n");
   }
 
   // Greetings
-  if (/^(hi|hello|hey|good morning|good afternoon)\b/.test(q)) {
-    return "Hello! Welcome to ÉcoLab. What would you like to explore today? We can work on microeconomics, mesoeconomics, macroeconomics or statistics.";
+  if (/^(hi|hello|hey|good morning|good afternoon|bonjour|salut|bonsoir|hola|buenos dias|buenas|ola|olá|oi|bom dia|boa tarde|salam|مرحبا|السلام|سلام|أهلا|اهلا)(?![\p{L}])/u.test(q)) {
+    return t("Hello! Welcome to ÉcoLab. What would you like to explore today? We can work on microeconomics, mesoeconomics, macroeconomics or statistics.");
   }
 
   // Identity
-  if (q.includes("who are you") || q.includes("what can you do")) {
-    return "I'm ÉcoBot, the economics learning assistant of ÉcoLab. I can introduce foundational concepts, explain formulas, walk through selected calculations and help you connect economic ideas to real-world situations. Choose a learning domain above to focus our conversation.";
+  const identityPhrases = ["who are you", "what can you do", "qui es-tu", "qui êtes-vous", "que peux-tu faire",
+    "quién eres", "qué puedes hacer", "quem é você", "quem es tu", "o que você pode fazer", "من أنت", "ماذا يمكنك"];
+  if (identityPhrases.some(phrase => q.includes(phrase))) {
+    return t("I'm ÉcoBot, the economics learning assistant of ÉcoLab. I can introduce foundational concepts, explain formulas, walk through selected calculations and help you connect economic ideas to real-world situations. Choose a learning domain above to focus our conversation.");
   }
 
   // Concept matching: score each topic by how specifically it matches,
   // so "value chains in mesoeconomics" picks value chains, not the overview.
   const topic = matchTopic(q, domain);
-  if (topic) return ecoKnowledge[topic];
+  if (topic) return (L10N.kb && L10N.kb[topic]) || ecoKnowledge[topic];
 
   // Domain-specific fallback
   if (domain === "micro") {
-    return (
+    return t(
       "You're exploring MICROECONOMICS.\n\n" +
       "I can currently help explain:\n" +
       "• Scarcity and opportunity cost\n" +
@@ -2337,7 +2582,7 @@ function answerEcoBot(question) {
   }
 
   if (domain === "meso") {
-    return (
+    return t(
       "You're exploring MESOECONOMICS.\n\n" +
       "I can currently help explain:\n" +
       "• Industrial clusters\n" +
@@ -2351,7 +2596,7 @@ function answerEcoBot(question) {
   }
 
   if (domain === "macro") {
-    return (
+    return t(
       "You're exploring MACROECONOMICS.\n\n" +
       "I can currently help explain:\n" +
       "• GDP and national income\n" +
@@ -2366,7 +2611,7 @@ function answerEcoBot(question) {
   }
 
   if (domain === "statistics") {
-    return (
+    return t(
       "You're exploring STATISTICS.\n\n" +
       "I can currently help explain:\n" +
       "• Mean, median and mode\n" +
@@ -2377,7 +2622,7 @@ function answerEcoBot(question) {
     );
   }
 
-  return (
+  return t(
     "That's an interesting question!\n\n" +
     "I currently work with a predefined educational knowledge base, " +
     "so I may not recognize every question yet.\n\n" +
@@ -2404,7 +2649,7 @@ function addChatMessage(content, sender) {
   if (sender === "bot") {
     const label = document.createElement("span");
     label.className = "message-label";
-    label.textContent = "ÉCOBOT · TUTOR";
+    label.textContent = t("ÉCOBOT · TUTOR");
     bubble.appendChild(label);
   }
 
@@ -2430,7 +2675,7 @@ function sendEcoBotMessage(question) {
 
   const typing = document.createElement("div");
   typing.className = "ecobot-typing";
-  typing.textContent = "ÉcoBot is thinking...";
+  typing.textContent = t("ÉcoBot is thinking...");
 
   chatMessages.appendChild(typing);
   chatMessages.scrollTop = chatMessages.scrollHeight;
