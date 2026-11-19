@@ -69,13 +69,17 @@ Topics include:
 
 ÉcoLab is designed around learning by doing.
 
-Planned and developing features include:
+Available now:
 
-- **Economic Simulations:** Experiment with supply, demand, prices, and market equilibrium.
-- **Economic Calculators:** Calculate elasticity, GDP, market concentration, and statistical indicators.
-- **Data Visualization:** Explore economic relationships through interactive graphs.
-- **Learning Modules:** Understand concepts through explanations, formulas, and practical examples.
-- **Knowledge Checks:** Test understanding through exercises and quizzes.
+- **Market Simulator:** Shift demand and supply, change their elasticities and add a per-unit tax. The chart shades consumer surplus, producer surplus, tax revenue and deadweight loss, and explains who bears the tax.
+- **Economic Calculators:** Price elasticity, GDP, inflation and purchasing power, unemployment and participation, market concentration (HHI), and descriptive statistics (including variance and standard deviation).
+- **Knowledge Check:** A quiz across micro, meso, macro and statistics with worked explanations, a review of missed questions and a saved personal best.
+- **ÉcoBot:** A rule-based tutor that explains core concepts across all three levels.
+
+In development:
+
+- **Data Visualization:** Explore economic relationships through more interactive graphs.
+- **Learning Modules:** Deeper explanations, formulas and practical examples.
 - **Cross-Level Analysis:** Explore how microeconomic decisions connect to mesoeconomic structures and macroeconomic outcomes.
 
 ## 4. Technology Stack

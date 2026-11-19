@@ -36,6 +36,7 @@
       <a href="#simulator">Simulator</a>
       <a href="#calculators">Calculators</a>
       <a href="#observatory">Observatory</a>
+      <a href="#quiz">Quiz</a>
       <a href="#about">About</a>
       <a href="#laboratories" class="nav-cta">Start learning <span>↗</span></a>
     </nav>
@@ -237,6 +238,20 @@
               <div class="slider-title"><label for="taxSlider">Per-unit tax</label><output id="taxValue">0</output></div>
               <input type="range" id="taxSlider" min="0" max="40" value="0">
               <div class="range-labels"><span>NO TAX</span><span>HIGH TAX</span></div>
+            </div>
+
+            <div class="slider-pair">
+              <div class="slider-control">
+                <div class="slider-title"><label for="demandSlopeSlider">Demand elasticity</label><output id="demandSlopeValue">Medium</output></div>
+                <input type="range" id="demandSlopeSlider" min="1" max="5" step="1" value="3">
+                <div class="range-labels"><span>STEEP</span><span>FLAT</span></div>
+              </div>
+
+              <div class="slider-control">
+                <div class="slider-title"><label for="supplySlopeSlider">Supply elasticity</label><output id="supplySlopeValue">Medium</output></div>
+                <input type="range" id="supplySlopeSlider" min="1" max="5" step="1" value="3">
+                <div class="range-labels"><span>STEEP</span><span>FLAT</span></div>
+              </div>
             </div>
 
             <div class="model-explanation" id="marketExplanation" aria-live="polite">
@@ -521,10 +536,38 @@
       </div>
     </section>
 
+    <!-- KNOWLEDGE CHECK -->
+    <section class="section section-wrap quiz-section" id="quiz">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow">06 — KNOWLEDGE CHECK</div>
+          <h2>Test your <span>thinking.</span></h2>
+        </div>
+        <p class="section-intro">
+          Short questions with worked explanations. Pick a level,
+          answer, and learn from every mistake.
+        </p>
+      </div>
+
+      <div class="quiz-layout">
+        <div class="quiz-filters" role="group" aria-label="Choose a quiz level">
+          <button type="button" class="quiz-filter active" data-level="all" aria-pressed="true">All levels</button>
+          <button type="button" class="quiz-filter" data-level="micro" aria-pressed="false">Micro</button>
+          <button type="button" class="quiz-filter" data-level="meso" aria-pressed="false">Meso</button>
+          <button type="button" class="quiz-filter" data-level="macro" aria-pressed="false">Macro</button>
+          <button type="button" class="quiz-filter" data-level="statistics" aria-pressed="false">Statistics</button>
+        </div>
+
+        <article class="quiz-card" id="quizCard">
+          <noscript>Enable JavaScript to take the quiz.</noscript>
+        </article>
+      </div>
+    </section>
+
     <!-- ABOUT -->
     <section class="section section-wrap about-section" id="about">
       <div class="about-left">
-        <div class="eyebrow">06 — THE IDEA</div>
+        <div class="eyebrow">07 — THE IDEA</div>
         <h2>Economics should be <span>experienced.</span></h2>
       </div>
       <div class="about-right">

@@ -75,23 +75,19 @@ if (yearElement) {
 /*
   Linear market model:
 
-  Demand:
-  Qd = A - Pb
-
-  Supply:
-  Qs = Ps - C
-
-  Tax wedge:
-  Pb = Ps + T
+  Demand (inverse):  Pb = A - b·Q
+  Supply (inverse):  Ps = C + d·Q
+  Tax wedge:         Pb = Ps + T
 
   At equilibrium:
-  Qd = Qs = Q
-
-  Therefore:
-  Q* = (A - C - T) / 2
-
-  Pb = A - Q*
+  Q* = (A - C - T) / (b + d)
+  Pb = A - b·Q*
   Ps = Pb - T
+
+  The slopes b and d come from the elasticity sliders: a flatter curve
+  means buyers (or sellers) respond more strongly to price, i.e. are
+  more elastic. The share of a tax borne by buyers is b / (b + d), so
+  the less elastic side of the market bears more of the tax.
 
   The model assumes:
   - Linear demand and supply.
@@ -102,10 +98,18 @@ if (yearElement) {
 const demandSlider = $("#demandSlider");
 const supplySlider = $("#supplySlider");
 const taxSlider = $("#taxSlider");
+const demandSlopeSlider = $("#demandSlopeSlider");
+const supplySlopeSlider = $("#supplySlopeSlider");
 
 const demandValue = $("#demandValue");
 const supplyValue = $("#supplyValue");
 const taxValue = $("#taxValue");
+const demandSlopeValue = $("#demandSlopeValue");
+const supplySlopeValue = $("#supplySlopeValue");
+
+// Elasticity slider positions 1–5 map to slopes 2 (steep) … 0.5 (flat).
+const ELASTICITY_LABELS = ["Very low", "Low", "Medium", "High", "Very high"];
+const slopeFromLevel = level => 2 ** ((3 - level) / 2);
 
 const buyerPriceOutput = $("#buyerPrice");
 const sellerPriceOutput = $("#sellerPrice");
@@ -130,6 +134,11 @@ function getMarketParameters() {
   const demandIntensity = Number(demandSlider?.value ?? 50);
   const supplyIntensity = Number(supplySlider?.value ?? 50);
   const tax = Number(taxSlider?.value ?? 0);
+  const demandLevel = Number(demandSlopeSlider?.value ?? 3);
+  const supplyLevel = Number(supplySlopeSlider?.value ?? 3);
+  const demandSlope = slopeFromLevel(demandLevel);
+  const supplySlope = slopeFromLevel(supplyLevel);
+  const slopeSum = demandSlope + supplySlope;
 
   /*
     Higher demand intensity shifts the demand intercept upward.
@@ -141,17 +150,17 @@ function getMarketParameters() {
 
   const quantity = Math.max(
     0,
-    (demandIntercept - supplyIntercept - tax) / 2
+    (demandIntercept - supplyIntercept - tax) / slopeSum
   );
 
-  const buyerPrice = demandIntercept - quantity;
+  const buyerPrice = demandIntercept - demandSlope * quantity;
   const sellerPrice = buyerPrice - tax;
 
   // No-tax benchmark, used for incidence and deadweight loss.
-  const baseQuantity = Math.max(0, (demandIntercept - supplyIntercept) / 2);
-  const basePrice = demandIntercept - baseQuantity;
+  const baseQuantity = Math.max(0, (demandIntercept - supplyIntercept) / slopeSum);
+  const basePrice = demandIntercept - demandSlope * baseQuantity;
 
-  // With slopes of -1 and +1, all surplus areas are simple triangles/rectangles.
+  // With linear curves, all surplus areas are simple triangles/rectangles.
   const consumerSurplus = 0.5 * quantity * (demandIntercept - buyerPrice);
   const producerSurplus = 0.5 * quantity * Math.max(0, sellerPrice - supplyIntercept);
   const taxRevenue = tax * quantity;
@@ -162,6 +171,10 @@ function getMarketParameters() {
     demandIntensity,
     supplyIntensity,
     tax,
+    demandLevel,
+    supplyLevel,
+    demandSlope,
+    supplySlope,
     demandIntercept,
     supplyIntercept,
     quantity,
@@ -187,6 +200,8 @@ function updateMarket() {
   if (demandValue) demandValue.textContent = state.demandIntensity;
   if (supplyValue) supplyValue.textContent = state.supplyIntensity;
   if (taxValue) taxValue.textContent = state.tax;
+  if (demandSlopeValue) demandSlopeValue.textContent = ELASTICITY_LABELS[state.demandLevel - 1];
+  if (supplySlopeValue) supplySlopeValue.textContent = ELASTICITY_LABELS[state.supplyLevel - 1];
 
   if (buyerPriceOutput) {
     buyerPriceOutput.textContent = state.noTrade ? "—" : formatNumber(state.buyerPrice);
@@ -231,7 +246,12 @@ function updateMarketExplanation(state) {
 
     message =
       `A per-unit tax of ${state.tax} drives a wedge between the price buyers pay (${formatNumber(state.buyerPrice)}) and the price sellers keep (${formatNumber(state.sellerPrice)}). ` +
-      `Buyers bear ${formatNumber(buyerShare)} and sellers ${formatNumber(sellerShare)} of it. ` +
+      `Buyers bear ${formatNumber(buyerShare)} and sellers ${formatNumber(sellerShare)} of it` +
+      (Math.abs(buyerShare - sellerShare) < 0.05
+        ? " — an even split, because both sides are equally responsive to price. "
+        : buyerShare > sellerShare
+          ? " — buyers carry more because demand is less elastic than supply. "
+          : " — sellers carry more because supply is less elastic than demand. ") +
       `Quantity falls from ${formatNumber(state.baseQuantity)} to ${formatNumber(state.quantity)}; the government collects ${formatNumber(state.taxRevenue, 1)}, but ${formatNumber(state.deadweightLoss, 1)} of surplus simply disappears — the deadweight loss.`;
   } else if (state.demandIntensity > 55) {
     message =
@@ -373,8 +393,8 @@ function drawMarketChart(state) {
   if (state.deadweightLoss > 0) {
     const Q = state.quantity;
     fillPolygon([
-      [Q, state.demandIntercept - Q],
-      [Q, state.supplyIntercept + Q],
+      [Q, state.demandIntercept - state.demandSlope * Q],
+      [Q, state.supplyIntercept + state.supplySlope * Q],
       [state.baseQuantity, state.basePrice]
     ], MARKET_COLORS.deadweight);
   }
@@ -403,10 +423,10 @@ function drawMarketChart(state) {
     return last;
   };
 
-  const demandEnd = drawCurve(q => state.demandIntercept - q, MARKET_COLORS.demand, 2.7);
-  const supplyEnd = drawCurve(q => state.supplyIntercept + q, MARKET_COLORS.supply, 2.7);
+  const demandEnd = drawCurve(q => state.demandIntercept - state.demandSlope * q, MARKET_COLORS.demand, 2.7);
+  const supplyEnd = drawCurve(q => state.supplyIntercept + state.supplySlope * q, MARKET_COLORS.supply, 2.7);
   const taxEnd = state.tax > 0
-    ? drawCurve(q => state.supplyIntercept + q + state.tax, MARKET_COLORS.tax, 1.7, [5, 4])
+    ? drawCurve(q => state.supplyIntercept + state.supplySlope * q + state.tax, MARKET_COLORS.tax, 1.7, [5, 4])
     : null;
 
   if (!state.noTrade) {
@@ -488,11 +508,11 @@ function drawMarketChart(state) {
   if (taxEnd) {
     ctx.fillStyle = MARKET_COLORS.tax;
     ctx.textAlign = "right";
-    ctx.fillText("S + TAX", x(taxEnd[0]) - 6, y(taxEnd[1]) + 10);
+    ctx.fillText("S + TAX", x(taxEnd[0]) - 6, Math.max(margin.top + 8, y(taxEnd[1]) - 6));
   }
 }
 
-[demandSlider, supplySlider, taxSlider].forEach(slider => {
+[demandSlider, supplySlider, taxSlider, demandSlopeSlider, supplySlopeSlider].forEach(slider => {
   if (slider) slider.addEventListener("input", updateMarket);
 });
 
@@ -503,6 +523,8 @@ if (resetMarket) {
     demandSlider.value = 50;
     supplySlider.value = 50;
     taxSlider.value = 0;
+    if (demandSlopeSlider) demandSlopeSlider.value = 3;
+    if (supplySlopeSlider) supplySlopeSlider.value = 3;
     updateMarket();
   });
 }
@@ -886,6 +908,371 @@ $$(".calculator-card").forEach(card => {
 
   button.click();
 });
+
+/* =====================================================
+   7c. KNOWLEDGE CHECK (QUIZ)
+===================================================== */
+
+/*
+  Each question: level, prompt, options, index of the correct option,
+  and an explanation shown after answering. Keep explanations short and
+  make sure the worked numbers can be checked by hand.
+*/
+
+const QUIZ_QUESTIONS = [
+  {
+    level: "micro",
+    prompt: "You can spend Saturday working a shift that pays 400 MAD or going to a concert with a 150 MAD ticket. What is the opportunity cost of going to the concert?",
+    options: ["150 MAD", "400 MAD", "550 MAD", "250 MAD"],
+    answer: 2,
+    explanation: "Opportunity cost includes everything you give up: the 150 MAD ticket plus the 400 MAD in wages you forgo by not working. 150 + 400 = 550 MAD."
+  },
+  {
+    level: "micro",
+    prompt: "The price of a good rises from 10 to 12 and quantity demanded falls from 100 to 80. Using the midpoint method, demand is…",
+    options: ["Inelastic (|PED| < 1)", "Unit elastic (|PED| = 1)", "Elastic (|PED| > 1)", "Perfectly inelastic"],
+    answer: 2,
+    explanation: "%ΔQ = −20 / 90 ≈ −22.2%. %ΔP = 2 / 11 ≈ 18.2%. |PED| ≈ 1.22 > 1, so demand is elastic. Try it in the elasticity calculator."
+  },
+  {
+    level: "micro",
+    prompt: "Holding supply constant, an increase in demand leads to…",
+    options: ["A higher price and a lower quantity", "A higher price and a higher quantity", "A lower price and a higher quantity", "No change in price"],
+    answer: 1,
+    explanation: "The demand curve shifts right and moves along the upward-sloping supply curve, so both equilibrium price and quantity rise."
+  },
+  {
+    level: "micro",
+    prompt: "A per-unit tax is placed on a good whose demand is very inelastic and whose supply is very elastic. Who bears most of the tax?",
+    options: ["Sellers", "Buyers", "It is always split 50/50", "Whoever legally pays the tax"],
+    answer: 1,
+    explanation: "The less elastic side of the market bears more of the tax. Buyers who cannot easily reduce their purchases end up paying most of it, whoever legally pays. Test this with the elasticity sliders in the simulator."
+  },
+  {
+    level: "micro",
+    prompt: "A firm's total cost rises from 1,000 to 1,060 when output increases from 20 to 21 units. What is the marginal cost of the 21st unit?",
+    options: ["50.5", "60", "1,060", "21"],
+    answer: 1,
+    explanation: "Marginal cost = ΔTC / ΔQ = (1,060 − 1,000) / (21 − 20) = 60."
+  },
+  {
+    level: "micro",
+    prompt: "Which market structure has a few large firms whose decisions depend on how their rivals react?",
+    options: ["Perfect competition", "Monopolistic competition", "Oligopoly", "Monopoly"],
+    answer: 2,
+    explanation: "Oligopoly is defined by a small number of interdependent firms, so strategic interaction is central."
+  },
+  {
+    level: "meso",
+    prompt: "Four firms have market shares of 40%, 30%, 20% and 10%. What is the Herfindahl-Hirschman Index (HHI)?",
+    options: ["100", "1,000", "2,500", "3,000"],
+    answer: 3,
+    explanation: "HHI = 40² + 30² + 20² + 10² = 1,600 + 900 + 400 + 100 = 3,000."
+  },
+  {
+    level: "meso",
+    prompt: "A geographic concentration of interconnected firms, specialised suppliers and institutions in one field is called…",
+    options: ["A value chain", "An industrial cluster", "A cartel", "A free-trade zone"],
+    answer: 1,
+    explanation: "An industrial cluster is defined by its location: related firms and institutions grouped in one place. A value chain is the sequence of activities that adds value to a product, wherever they happen."
+  },
+  {
+    level: "meso",
+    prompt: "A sector produces 2,000,000 of value added with 400 workers. What is its labour productivity?",
+    options: ["800 per worker", "5,000 per worker", "50,000 per worker", "2,000,400"],
+    answer: 1,
+    explanation: "Labour productivity = value added / workers = 2,000,000 / 400 = 5,000 per worker."
+  },
+  {
+    level: "meso",
+    prompt: "A car maker buys the company that supplies its engines. This is an example of…",
+    options: ["Horizontal integration", "Vertical integration", "Outsourcing", "A merger between competitors"],
+    answer: 1,
+    explanation: "Taking over a firm at a different stage of the same supply chain is vertical integration. Buying a rival car maker would be horizontal integration."
+  },
+  {
+    level: "macro",
+    prompt: "C = 500, I = 150, G = 200, X = 120, M = 90. What is GDP?",
+    options: ["970", "880", "1,060", "850"],
+    answer: 1,
+    explanation: "GDP = C + I + G + (X − M) = 500 + 150 + 200 + (120 − 90) = 880."
+  },
+  {
+    level: "macro",
+    prompt: "The CPI rises from 120 to 126. What is the inflation rate?",
+    options: ["6%", "5%", "4.8%", "26%"],
+    answer: 1,
+    explanation: "Inflation = (126 − 120) / 120 × 100 = 5%. Divide by the old index, not the new one."
+  },
+  {
+    level: "macro",
+    prompt: "A country has 9,200 employed people and 800 unemployed people looking for work. What is the unemployment rate?",
+    options: ["8.0%", "8.7%", "5.0%", "80%"],
+    answer: 0,
+    explanation: "Labour force = 9,200 + 800 = 10,000. Unemployment rate = 800 / 10,000 × 100 = 8%."
+  },
+  {
+    level: "macro",
+    prompt: "Which of these is an example of contractionary monetary policy?",
+    options: ["The government cuts income taxes", "The central bank raises its policy interest rate", "The government increases infrastructure spending", "The central bank buys government bonds"],
+    answer: 1,
+    explanation: "Raising the policy rate makes borrowing more expensive and slows spending, so it is contractionary. Tax and spending changes are fiscal policy, not monetary policy."
+  },
+  {
+    level: "macro",
+    prompt: "Why are imports subtracted in the expenditure approach to GDP?",
+    options: [
+      "Because imports harm the economy",
+      "Because they are already counted in C, I and G but were not produced domestically",
+      "Because imports are taxed",
+      "Because exports and imports always cancel out"
+    ],
+    answer: 1,
+    explanation: "Household, business and government spending includes foreign-made goods. Subtracting M removes them so that GDP counts only domestic production."
+  },
+  {
+    level: "statistics",
+    prompt: "Incomes in a small group: 3,000 · 3,200 · 3,500 · 3,800 · 40,000. Which measure best describes a typical income?",
+    options: ["The mean (10,700)", "The median (3,500)", "The range (37,000)", "The maximum (40,000)"],
+    answer: 1,
+    explanation: "One extreme value pulls the mean far above what most people earn. The median is robust to outliers, so it better reflects a typical income."
+  },
+  {
+    level: "statistics",
+    prompt: "What is the mode of the dataset 2, 4, 4, 5, 7, 7, 7, 9?",
+    options: ["4", "5.625", "6", "7"],
+    answer: 3,
+    explanation: "The mode is the most frequent value. 7 appears three times, more than any other value. (5.625 is the mean, 6 is the median.)"
+  },
+  {
+    level: "statistics",
+    prompt: "For the sample 2, 4, 6, what is the sample standard deviation?",
+    options: ["2", "4", "1.63", "8"],
+    answer: 0,
+    explanation: "Mean = 4. Squared deviations: 4 + 0 + 4 = 8. Sample variance = 8 / (n − 1) = 8 / 2 = 4, so s = √4 = 2. (1.63 is the population standard deviation, √(8/3).)"
+  }
+];
+
+const QUIZ_LEVEL_NAMES = {
+  all: "All levels",
+  micro: "Micro",
+  meso: "Meso",
+  macro: "Macro",
+  statistics: "Statistics"
+};
+
+const QUIZ_STORAGE_KEY = "ecolab-quiz-best";
+
+const quizRoot = $("#quizCard");
+const quizFilters = $$(".quiz-filter");
+
+let quizState = null;
+
+function readBestScores() {
+  try {
+    return JSON.parse(localStorage.getItem(QUIZ_STORAGE_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function saveBestScore(level, percent) {
+  try {
+    const best = readBestScores();
+    if (!(level in best) || percent > best[level]) {
+      best[level] = percent;
+      localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(best));
+    }
+  } catch {
+    // Storage can be unavailable (private mode); the quiz still works.
+  }
+}
+
+function shuffle(items) {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function startQuiz(level = "all") {
+  const pool = QUIZ_QUESTIONS.filter(q => level === "all" || q.level === level);
+  const questions = shuffle(pool)
+    .slice(0, level === "all" ? 10 : pool.length)
+    .map(question => {
+      // Shuffle the options too, tracking where the correct one lands.
+      const order = shuffle(question.options.map((_, i) => i));
+      return {
+        ...question,
+        options: order.map(i => question.options[i]),
+        answer: order.indexOf(question.answer)
+      };
+    });
+
+  quizState = { level, questions, index: 0, score: 0, answered: false, missed: [] };
+
+  quizFilters.forEach(button => {
+    const active = button.dataset.level === level;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+
+  renderQuestion();
+}
+
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function renderQuestion() {
+  if (!quizRoot || !quizState) return;
+
+  const { questions, index, score } = quizState;
+  const question = questions[index];
+
+  quizRoot.replaceChildren();
+
+  const meta = el("div", "quiz-meta");
+  meta.append(
+    el("span", "quiz-level", QUIZ_LEVEL_NAMES[question.level].toUpperCase()),
+    el("span", "quiz-progress-text", `QUESTION ${index + 1} / ${questions.length} · SCORE ${score}`)
+  );
+
+  const bar = el("div", "quiz-progress");
+  const fill = el("span");
+  fill.style.width = `${(index / questions.length) * 100}%`;
+  bar.appendChild(fill);
+
+  const prompt = el("h3", "quiz-prompt", question.prompt);
+
+  const options = el("div", "quiz-options");
+  options.setAttribute("role", "group");
+  options.setAttribute("aria-label", "Answer options");
+
+  question.options.forEach((text, optionIndex) => {
+    const button = el("button", "quiz-option");
+    button.type = "button";
+    button.append(el("span", "quiz-option-letter", String.fromCharCode(65 + optionIndex)), el("span", "", text));
+    button.addEventListener("click", () => answerQuestion(optionIndex));
+    options.appendChild(button);
+  });
+
+  const feedback = el("div", "quiz-feedback");
+  feedback.setAttribute("aria-live", "polite");
+  feedback.hidden = true;
+
+  quizRoot.append(meta, bar, prompt, options, feedback);
+}
+
+function answerQuestion(choice) {
+  if (!quizState || quizState.answered) return;
+
+  quizState.answered = true;
+
+  const question = quizState.questions[quizState.index];
+  const correct = choice === question.answer;
+
+  if (correct) quizState.score += 1;
+  else quizState.missed.push(question);
+
+  const buttons = [...quizRoot.querySelectorAll(".quiz-option")];
+  buttons.forEach((button, i) => {
+    button.disabled = true;
+    if (i === question.answer) button.classList.add("correct");
+    else if (i === choice) button.classList.add("incorrect");
+  });
+
+  const feedback = quizRoot.querySelector(".quiz-feedback");
+  feedback.replaceChildren(
+    el("strong", correct ? "is-correct" : "is-incorrect", correct ? "✓ Correct" : "✗ Not quite"),
+    el("p", "", question.explanation)
+  );
+
+  const isLast = quizState.index === quizState.questions.length - 1;
+  const next = el("button", "button button-dark quiz-next");
+  next.type = "button";
+  next.append(isLast ? "See results " : "Next question ", el("span", "", "→"));
+  next.addEventListener("click", () => {
+    if (isLast) {
+      renderResults();
+    } else {
+      quizState.index += 1;
+      quizState.answered = false;
+      renderQuestion();
+    }
+  });
+
+  feedback.appendChild(next);
+  feedback.hidden = false;
+  next.focus();
+
+  quizRoot.querySelector(".quiz-progress-text").textContent =
+    `QUESTION ${quizState.index + 1} / ${quizState.questions.length} · SCORE ${quizState.score}`;
+}
+
+function renderResults() {
+  const { level, questions, score, missed } = quizState;
+  const percent = Math.round((score / questions.length) * 100);
+  const previousBest = readBestScores()[level];
+
+  saveBestScore(level, percent);
+
+  let verdict;
+  if (percent === 100) verdict = "Perfect score. You think like an economist.";
+  else if (percent >= 70) verdict = "Strong result. Review the questions below to close the gaps.";
+  else if (percent >= 40) verdict = "Good start. Revisit the topics below and try again.";
+  else verdict = "Keep experimenting. The simulator, calculators and ÉcoBot can help.";
+
+  quizRoot.replaceChildren();
+
+  const header = el("div", "quiz-result-header");
+  header.append(
+    el("span", "quiz-level", `${QUIZ_LEVEL_NAMES[level].toUpperCase()} · RESULTS`),
+    el("div", "quiz-score", `${score} / ${questions.length}`),
+    el("p", "quiz-verdict", verdict)
+  );
+
+  if (previousBest !== undefined) {
+    header.appendChild(el("p", "quiz-best", percent > previousBest
+      ? `New personal best! (previous: ${previousBest}%)`
+      : `Your best on this set: ${previousBest}%`));
+  }
+
+  quizRoot.appendChild(header);
+
+  if (missed.length) {
+    const review = el("div", "quiz-review");
+    review.appendChild(el("span", "quiz-review-title", "REVIEW"));
+
+    missed.forEach(question => {
+      const item = el("div", "quiz-review-item");
+      item.append(
+        el("strong", "", question.prompt),
+        el("p", "", `Answer: ${question.options[question.answer]}. ${question.explanation}`)
+      );
+      review.appendChild(item);
+    });
+
+    quizRoot.appendChild(review);
+  }
+
+  const restart = el("button", "button button-dark quiz-next");
+  restart.type = "button";
+  restart.append("Try again ", el("span", "", "↺"));
+  restart.addEventListener("click", () => startQuiz(level));
+  quizRoot.appendChild(restart);
+}
+
+quizFilters.forEach(button => {
+  button.addEventListener("click", () => startQuiz(button.dataset.level));
+});
+
+if (quizRoot) startQuiz("all");
 
 /* =====================================================
    8. ÉCOBOT — ECONOMICS TUTOR
