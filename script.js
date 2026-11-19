@@ -116,6 +116,16 @@ const marketCanvas = $("#marketChart");
 
 let marketState = null;
 
+const MARKET_COLORS = {
+  demand: "#b9f36b",
+  supply: "#91abc8",
+  tax: "#e7b77b",
+  consumer: "rgba(185, 243, 107, 0.16)",
+  producer: "rgba(145, 171, 200, 0.2)",
+  revenue: "rgba(231, 183, 123, 0.22)",
+  deadweight: "rgba(240, 120, 100, 0.38)"
+};
+
 function getMarketParameters() {
   const demandIntensity = Number(demandSlider?.value ?? 50);
   const supplyIntensity = Number(supplySlider?.value ?? 50);
@@ -137,6 +147,17 @@ function getMarketParameters() {
   const buyerPrice = demandIntercept - quantity;
   const sellerPrice = buyerPrice - tax;
 
+  // No-tax benchmark, used for incidence and deadweight loss.
+  const baseQuantity = Math.max(0, (demandIntercept - supplyIntercept) / 2);
+  const basePrice = demandIntercept - baseQuantity;
+
+  // With slopes of -1 and +1, all surplus areas are simple triangles/rectangles.
+  const consumerSurplus = 0.5 * quantity * (demandIntercept - buyerPrice);
+  const producerSurplus = 0.5 * quantity * Math.max(0, sellerPrice - supplyIntercept);
+  const taxRevenue = tax * quantity;
+  const deadweightLoss = Math.max(0, 0.5 * (baseQuantity - quantity) * Math.min(tax, demandIntercept - supplyIntercept));
+  const noTrade = quantity <= 0;
+
   return {
     demandIntensity,
     supplyIntensity,
@@ -145,7 +166,14 @@ function getMarketParameters() {
     supplyIntercept,
     quantity,
     buyerPrice,
-    sellerPrice
+    sellerPrice,
+    baseQuantity,
+    basePrice,
+    consumerSurplus,
+    producerSurplus,
+    taxRevenue,
+    deadweightLoss,
+    noTrade
   };
 }
 
@@ -161,16 +189,28 @@ function updateMarket() {
   if (taxValue) taxValue.textContent = state.tax;
 
   if (buyerPriceOutput) {
-    buyerPriceOutput.textContent = formatNumber(state.buyerPrice);
+    buyerPriceOutput.textContent = state.noTrade ? "—" : formatNumber(state.buyerPrice);
   }
 
   if (sellerPriceOutput) {
-    sellerPriceOutput.textContent = formatNumber(state.sellerPrice);
+    sellerPriceOutput.textContent = state.noTrade ? "—" : formatNumber(state.sellerPrice);
   }
 
   if (quantityOutput) {
     quantityOutput.textContent = formatNumber(state.quantity);
   }
+
+  const welfareOutputs = {
+    consumerSurplus: "#consumerSurplus",
+    producerSurplus: "#producerSurplus",
+    taxRevenue: "#taxRevenue",
+    deadweightLoss: "#deadweightLoss"
+  };
+
+  Object.entries(welfareOutputs).forEach(([key, selector]) => {
+    const element = $(selector);
+    if (element) element.textContent = formatNumber(state[key], 1);
+  });
 
   updateMarketExplanation(state);
   drawMarketChart(state);
@@ -181,9 +221,18 @@ function updateMarketExplanation(state) {
 
   let message = "";
 
-  if (state.tax > 0) {
+  if (state.noTrade) {
+    message = state.tax > 0 && state.baseQuantity > 0
+      ? `At a tax of ${state.tax}, the highest price any buyer will pay is below the lowest price any seller will accept plus the tax. The market shuts down entirely: all potential gains from trade (${formatNumber(state.deadweightLoss, 1)}) are lost as deadweight loss.`
+      : "Even the most eager buyer values the good less than the lowest-cost seller can produce it, so no trade takes place.";
+  } else if (state.tax > 0) {
+    const buyerShare = state.buyerPrice - state.basePrice;
+    const sellerShare = state.basePrice - state.sellerPrice;
+
     message =
-      `A per-unit tax of ${state.tax} creates a wedge between the price paid by buyers (${formatNumber(state.buyerPrice)}) and the price received by sellers (${formatNumber(state.sellerPrice)}). Equilibrium quantity falls relative to the no-tax equilibrium.`;
+      `A per-unit tax of ${state.tax} drives a wedge between the price buyers pay (${formatNumber(state.buyerPrice)}) and the price sellers keep (${formatNumber(state.sellerPrice)}). ` +
+      `Buyers bear ${formatNumber(buyerShare)} and sellers ${formatNumber(sellerShare)} of it. ` +
+      `Quantity falls from ${formatNumber(state.baseQuantity)} to ${formatNumber(state.quantity)}; the government collects ${formatNumber(state.taxRevenue, 1)}, but ${formatNumber(state.deadweightLoss, 1)} of surplus simply disappears — the deadweight loss.`;
   } else if (state.demandIntensity > 55) {
     message =
       "Demand is relatively strong. In this model, the equilibrium price and quantity rise as demand increases, holding supply conditions constant.";
@@ -294,127 +343,123 @@ function drawMarketChart(state) {
   ctx.lineTo(width - margin.right, height - margin.bottom);
   ctx.stroke();
 
-  // Demand curve: P = A - Q
-  ctx.strokeStyle = "#b9f36b";
-  ctx.lineWidth = 2.7;
+  // Welfare areas (drawn first so curves sit on top)
+  const fillPolygon = (points, color) => {
+    if (points.length < 3) return;
+    ctx.beginPath();
+    ctx.moveTo(x(points[0][0]), y(points[0][1]));
+    points.slice(1).forEach(([qv, pv]) => ctx.lineTo(x(qv), y(pv)));
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+  };
 
-  ctx.beginPath();
+  if (!state.noTrade) {
+    const Q = state.quantity;
 
-  let started = false;
+    // Consumer surplus: below demand, above buyer price
+    fillPolygon([[0, state.demandIntercept], [0, state.buyerPrice], [Q, state.buyerPrice]], MARKET_COLORS.consumer);
 
-  for (let q = 0; q <= 100; q += 1) {
-    const p = state.demandIntercept - q;
+    // Producer surplus: above supply, below seller price
+    fillPolygon([[0, Math.max(0, state.supplyIntercept)], [0, state.sellerPrice], [Q, state.sellerPrice]], MARKET_COLORS.producer);
 
-    if (p < 0 || p > 100) continue;
-
-    if (!started) {
-      ctx.moveTo(x(q), y(p));
-      started = true;
-    } else {
-      ctx.lineTo(x(q), y(p));
+    // Tax revenue: rectangle between the two prices
+    if (state.tax > 0) {
+      fillPolygon([[0, state.buyerPrice], [Q, state.buyerPrice], [Q, state.sellerPrice], [0, state.sellerPrice]], MARKET_COLORS.revenue);
     }
   }
 
-  ctx.stroke();
-
-  // Supply curve: Ps = C + Q
-  ctx.strokeStyle = "#91abc8";
-  ctx.lineWidth = 2.7;
-  ctx.beginPath();
-
-  started = false;
-
-  for (let q = 0; q <= 100; q += 1) {
-    const p = state.supplyIntercept + q;
-
-    if (p < 0 || p > 100) continue;
-
-    if (!started) {
-      ctx.moveTo(x(q), y(p));
-      started = true;
-    } else {
-      ctx.lineTo(x(q), y(p));
-    }
+  // Deadweight loss: triangle between the taxed and untaxed equilibria
+  if (state.deadweightLoss > 0) {
+    const Q = state.quantity;
+    fillPolygon([
+      [Q, state.demandIntercept - Q],
+      [Q, state.supplyIntercept + Q],
+      [state.baseQuantity, state.basePrice]
+    ], MARKET_COLORS.deadweight);
   }
 
-  ctx.stroke();
-
-  // Tax-inclusive supply curve: Pb = C + Q + T
-  if (state.tax > 0) {
-    ctx.strokeStyle = "#e7b77b";
-    ctx.lineWidth = 1.7;
-    ctx.setLineDash([5, 4]);
-
+  // Curves: return the last visible point so labels sit at the end of each line
+  const drawCurve = (priceAt, color, width, dash = []) => {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.setLineDash(dash);
     ctx.beginPath();
 
-    started = false;
+    let last = null;
 
-    for (let q = 0; q <= 100; q += 1) {
-      const p = state.supplyIntercept + q + state.tax;
-
+    for (let q = 0; q <= 100; q += 0.5) {
+      const p = priceAt(q);
       if (p < 0 || p > 100) continue;
 
-      if (!started) {
-        ctx.moveTo(x(q), y(p));
-        started = true;
-      } else {
-        ctx.lineTo(x(q), y(p));
-      }
+      if (!last) ctx.moveTo(x(q), y(p));
+      else ctx.lineTo(x(q), y(p));
+
+      last = [q, p];
     }
 
     ctx.stroke();
     ctx.setLineDash([]);
-  }
+    return last;
+  };
 
-  // Equilibrium guide lines
-  const eqX = x(state.quantity);
-  const buyerY = y(state.buyerPrice);
-  const sellerY = y(state.sellerPrice);
+  const demandEnd = drawCurve(q => state.demandIntercept - q, MARKET_COLORS.demand, 2.7);
+  const supplyEnd = drawCurve(q => state.supplyIntercept + q, MARKET_COLORS.supply, 2.7);
+  const taxEnd = state.tax > 0
+    ? drawCurve(q => state.supplyIntercept + q + state.tax, MARKET_COLORS.tax, 1.7, [5, 4])
+    : null;
 
-  ctx.strokeStyle = "#d4e4cb";
-  ctx.lineWidth = 1;
-  ctx.setLineDash([4, 4]);
+  if (!state.noTrade) {
+    // Equilibrium guide lines
+    const eqX = x(state.quantity);
+    const buyerY = y(state.buyerPrice);
+    const sellerY = y(state.sellerPrice);
 
-  ctx.beginPath();
-  ctx.moveTo(eqX, buyerY);
-  ctx.lineTo(eqX, height - margin.bottom);
-  ctx.stroke();
+    ctx.strokeStyle = "#d4e4cb";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
 
-  if (state.tax > 0) {
     ctx.beginPath();
-    ctx.moveTo(margin.left, buyerY);
-    ctx.lineTo(eqX, buyerY);
+    ctx.moveTo(eqX, buyerY);
+    ctx.lineTo(eqX, height - margin.bottom);
     ctx.stroke();
 
+    if (state.tax > 0) {
+      ctx.beginPath();
+      ctx.moveTo(margin.left, buyerY);
+      ctx.lineTo(eqX, buyerY);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(margin.left, sellerY);
+      ctx.lineTo(eqX, sellerY);
+      ctx.stroke();
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(margin.left, buyerY);
+      ctx.lineTo(eqX, buyerY);
+      ctx.stroke();
+    }
+
+    ctx.setLineDash([]);
+
+    // Buyer equilibrium point
     ctx.beginPath();
-    ctx.moveTo(margin.left, sellerY);
-    ctx.lineTo(eqX, sellerY);
-    ctx.stroke();
-  } else {
-    ctx.beginPath();
-    ctx.moveTo(margin.left, buyerY);
-    ctx.lineTo(eqX, buyerY);
-    ctx.stroke();
-  }
-
-  ctx.setLineDash([]);
-
-  // Buyer equilibrium point
-  ctx.beginPath();
-  ctx.arc(eqX, buyerY, 5.5, 0, Math.PI * 2);
-  ctx.fillStyle = "#b9f36b";
-  ctx.fill();
-
-  ctx.strokeStyle = "#17251e";
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  // Seller equilibrium point when tax is present
-  if (state.tax > 0) {
-    ctx.beginPath();
-    ctx.arc(eqX, sellerY, 4.5, 0, Math.PI * 2);
-    ctx.fillStyle = "#e7b77b";
+    ctx.arc(eqX, buyerY, 5.5, 0, Math.PI * 2);
+    ctx.fillStyle = "#b9f36b";
     ctx.fill();
+
+    ctx.strokeStyle = "#17251e";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Seller equilibrium point when tax is present
+    if (state.tax > 0) {
+      ctx.beginPath();
+      ctx.arc(eqX, sellerY, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = "#e7b77b";
+      ctx.fill();
+    }
   }
 
   // Axis titles
@@ -426,18 +471,24 @@ function drawMarketChart(state) {
   ctx.textAlign = "right";
   ctx.fillText("QUANTITY", width - margin.right, height - 3);
 
-  // Curve labels
+  // Curve labels at the end of each line
   ctx.font = "10px monospace";
-  ctx.textAlign = "right";
-  ctx.fillStyle = "#b9f36b";
-  ctx.fillText("D", width - margin.right - 5, y(Math.max(8, state.demandIntercept - 10)));
+  ctx.textAlign = "left";
 
-  ctx.fillStyle = "#91abc8";
-  ctx.fillText("S", width - margin.right - 5, y(Math.min(90, state.supplyIntercept + 80)));
+  const labelAt = (end, text, color, dy) => {
+    if (!end) return;
+    ctx.fillStyle = color;
+    const lx = Math.min(x(end[0]) + 6, width - margin.right - ctx.measureText(text).width);
+    ctx.fillText(text, lx, y(end[1]) + dy);
+  };
 
-  if (state.tax > 0) {
-    ctx.fillStyle = "#e7b77b";
-    ctx.fillText("S + TAX", width - margin.right - 5, y(Math.min(95, state.supplyIntercept + state.tax + 80)));
+  labelAt(demandEnd, "D", MARKET_COLORS.demand, -4);
+  labelAt(supplyEnd, "S", MARKET_COLORS.supply, 12);
+  // The taxed supply label sits just left of its line end so it never collides with "S".
+  if (taxEnd) {
+    ctx.fillStyle = MARKET_COLORS.tax;
+    ctx.textAlign = "right";
+    ctx.fillText("S + TAX", x(taxEnd[0]) - 6, y(taxEnd[1]) + 10);
   }
 }
 
@@ -704,6 +755,13 @@ if (statsButton) {
     const { q1, q3 } = quartilesOf(sorted);
     const iqr = q3 - q1;
 
+    const squaredDeviations = values.reduce((total, value) => total + (value - mean) ** 2, 0);
+    const populationVariance = squaredDeviations / n;
+    const sampleVariance = n > 1 ? squaredDeviations / (n - 1) : NaN;
+    const sampleSD = Math.sqrt(sampleVariance);
+    const cv = mean !== 0 ? (sampleSD / Math.abs(mean)) * 100 : NaN;
+    const show = value => Number.isFinite(value) ? formatNumber(value) : "n/a (needs 2+ values)";
+
     const result =
       `DESCRIPTIVE STATISTICS\n\n` +
       `Observations: ${n}\n` +
@@ -717,11 +775,117 @@ if (statsButton) {
       `First quartile (Q1): ${formatNumber(q1)}\n` +
       `Third quartile (Q3): ${formatNumber(q3)}\n` +
       `Interquartile range: ${formatNumber(iqr)}\n\n` +
-      `Method: Median of the lower and upper halves.`;
+      `Population variance (σ²): ${formatNumber(populationVariance)}\n` +
+      `Population std. deviation (σ): ${formatNumber(Math.sqrt(populationVariance))}\n` +
+      `Sample variance (s²): ${show(sampleVariance)}\n` +
+      `Sample std. deviation (s): ${show(sampleSD)}\n` +
+      `Coefficient of variation: ${Number.isFinite(cv) ? formatNumber(cv) + "%" : "n/a"}\n\n` +
+      `Quartile method: median of the lower and upper halves.`;
 
     showResult("statsResult", result);
   });
 }
+
+/* =====================================================
+   7b. INFLATION AND UNEMPLOYMENT CALCULATORS
+===================================================== */
+
+const inflationButton = $("#calculateInflation");
+
+if (inflationButton) {
+  inflationButton.addEventListener("click", () => {
+    const oldCPI = readNumber("cpiOld");
+    const newCPI = readNumber("cpiNew");
+    const nominal = readNumber("nominalValue");
+
+    if (![oldCPI, newCPI].every(Number.isFinite) || oldCPI <= 0 || newCPI <= 0) {
+      showResult("inflationResult", "Enter two positive price index values.", true);
+      return;
+    }
+
+    const rate = ((newCPI - oldCPI) / oldCPI) * 100;
+    let text =
+      `INFLATION RATE\n\n` +
+      `Inflation = (${formatNumber(newCPI)} − ${formatNumber(oldCPI)}) / ${formatNumber(oldCPI)} × 100\n` +
+      `Inflation = ${formatNumber(rate)}%\n\n`;
+
+    if (rate > 0) text += `Prices rose: the same basket now costs ${formatNumber(rate)}% more.`;
+    else if (rate < 0) text += `Prices fell: this is deflation of ${formatNumber(Math.abs(rate))}%.`;
+    else text += "The price level is unchanged.";
+
+    if (Number.isFinite(nominal)) {
+      const real = nominal * (oldCPI / newCPI);
+      text +=
+        `\n\nPURCHASING POWER\n` +
+        `${formatNumber(nominal)} today buys what ${formatNumber(real)} bought in the base period.\n` +
+        `Real value = Nominal × (Old CPI / New CPI)`;
+    }
+
+    showResult("inflationResult", text);
+  });
+}
+
+const unemploymentButton = $("#calculateUnemployment");
+
+if (unemploymentButton) {
+  unemploymentButton.addEventListener("click", () => {
+    const employed = readNumber("employed");
+    const unemployed = readNumber("unemployed");
+    const population = readNumber("workingAgePop");
+
+    if (
+      ![employed, unemployed].every(Number.isFinite) ||
+      employed < 0 || unemployed < 0 || employed + unemployed === 0
+    ) {
+      showResult("unemploymentResult", "Enter non-negative numbers for employed and unemployed people.", true);
+      return;
+    }
+
+    const labourForce = employed + unemployed;
+    const rate = (unemployed / labourForce) * 100;
+
+    let text =
+      `LABOUR MARKET\n\n` +
+      `Labour force = ${formatNumber(employed)} + ${formatNumber(unemployed)} = ${formatNumber(labourForce)}\n\n` +
+      `Unemployment rate = ${formatNumber(unemployed)} / ${formatNumber(labourForce)} × 100\n` +
+      `Unemployment rate = ${formatNumber(rate)}%`;
+
+    if (Number.isFinite(population)) {
+      if (population < labourForce) {
+        showResult("unemploymentResult", "Working-age population cannot be smaller than the labour force.", true);
+        return;
+      }
+
+      text +=
+        `\n\nParticipation rate = ${formatNumber((labourForce / population) * 100)}%\n` +
+        `Employment rate = ${formatNumber((employed / population) * 100)}%\n` +
+        `Outside the labour force: ${formatNumber(population - labourForce)}`;
+    }
+
+    showResult("unemploymentResult", text);
+  });
+}
+
+/* -----------------------------------------------------
+   Calculator conveniences: press Enter to calculate,
+   and show the worked default example on first load.
+----------------------------------------------------- */
+
+$$(".calculator-card").forEach(card => {
+  const button = card.querySelector(".calc-button");
+  if (!button) return;
+
+  card.querySelectorAll("input").forEach(input => {
+    input.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        button.click();
+      }
+    });
+  });
+
+  button.click();
+});
 
 /* =====================================================
    8. ÉCOBOT — ECONOMICS TUTOR
@@ -1247,7 +1411,168 @@ People may benefit from street lighting even if
 they do not directly pay for it.
 
 The free-rider problem can lead to under-provision
-of public goods by private markets.`
+of public goods by private markets.`,
+
+  microVsMacro: `MICROECONOMICS VS MACROECONOMICS
+
+Microeconomics zooms in on individual decision-makers:
+households, firms and single markets.
+Typical questions: Why did the price of coffee rise?
+How many workers should this firm hire?
+
+Macroeconomics zooms out to the whole economy.
+Typical questions: Why is inflation 5%? Why did
+national output fall during a recession?
+
+Mesoeconomics sits in between: industries, sectors,
+value chains and regions.
+
+The levels are connected. Millions of micro decisions
+add up to macro outcomes, and macro conditions
+(interest rates, inflation) shape micro decisions.`,
+
+  meanVsMedian: `MEAN VS MEDIAN
+
+Mean = sum of values / number of values.
+Median = the middle value of the ordered data.
+
+Example (monthly incomes):
+3,000 · 3,200 · 3,500 · 3,800 · 40,000
+
+Mean   = 53,500 / 5 = 10,700
+Median = 3,500
+
+One very high income pulls the mean far above what
+a typical person earns, while the median barely moves.
+
+Rule of thumb: for skewed data such as income or
+house prices, the median is usually the better
+measure of a "typical" value.`,
+
+  taxIncidence: `TAXES, SURPLUS AND DEADWEIGHT LOSS
+
+Consumer surplus: the difference between what buyers
+are willing to pay and what they actually pay.
+
+Producer surplus: the difference between the price
+sellers receive and their minimum acceptable price.
+
+A per-unit tax drives a wedge between the price buyers
+pay and the price sellers keep. Three things happen:
+
+• Quantity traded falls.
+• Part of the old surplus becomes tax revenue.
+• Part of it disappears entirely: the deadweight loss.
+
+Who bears the tax (its incidence) does not depend on
+who legally pays it. The less elastic side of the
+market bears the larger share.
+
+Try it: raise the per-unit tax in the ÉcoLab simulator
+and watch the red deadweight-loss triangle grow.`,
+
+  mode: `MODE
+
+The mode is the value that appears most often in a
+dataset.
+
+Example: 2, 4, 4, 5, 7, 7, 7, 9
+Mode = 7 (it appears three times)
+
+A dataset can have:
+• No mode (every value appears once)
+• One mode (unimodal)
+• Several modes (bimodal, multimodal)
+
+The mode is the only measure of central tendency that
+also works for categorical data, such as the most
+popular car brand in a survey.`,
+
+  dispersion: `VARIANCE AND STANDARD DEVIATION
+
+These measure how spread out the data are around
+the mean.
+
+Population variance:
+σ² = Σ (x − mean)² / N
+
+Sample variance:
+s² = Σ (x − mean)² / (n − 1)
+
+Standard deviation is the square root of the variance,
+so it is expressed in the same units as the data.
+
+Example: 2, 4, 6
+Mean = 4
+Squared deviations: 4, 0, 4 → sum = 8
+Population variance = 8 / 3 ≈ 2.67
+Sample variance = 8 / 2 = 4
+Sample standard deviation = 2
+
+Use n − 1 when your data are a sample drawn from
+a larger population.`,
+
+  supplychain: `SUPPLY CHAINS AND INDUSTRIAL ORGANIZATION
+
+A supply chain is the network of firms that moves a
+product from raw materials to the final customer:
+suppliers, manufacturers, logistics providers,
+wholesalers and retailers.
+
+Industrial organization studies how these industries
+are structured: how many firms there are, how they
+compete, how vertically integrated they are, and how
+market power affects prices and output.
+
+Why it matters:
+• A shock in one link (a factory closure, a port
+  blockage) can ripple through the whole chain.
+• Firms choose between producing in-house (vertical
+  integration) and buying from suppliers (outsourcing).
+• Concentration at one stage can affect prices at
+  every later stage.`,
+
+  productivity: `SECTORAL PRODUCTIVITY
+
+Productivity measures how much output is produced
+per unit of input.
+
+Labour productivity =
+Output (value added) / Hours worked (or employees)
+
+Example:
+A sector produces 2,000,000 of value added
+with 400 workers.
+Labour productivity = 2,000,000 / 400 = 5,000 per worker.
+
+Productivity differs widely across sectors because of
+differences in capital, technology, skills and scale.
+
+Shifting workers from low-productivity sectors to
+high-productivity sectors (structural change) is an
+important source of economic growth.`,
+
+  regional: `REGIONAL ECONOMIC DEVELOPMENT
+
+Regional development studies why some regions within
+a country grow faster than others, and how to reduce
+gaps between them.
+
+Key drivers:
+• Infrastructure (transport, energy, digital)
+• Human capital and education
+• Industrial clusters and specialization
+• Access to markets and finance
+• Quality of local institutions
+
+Common indicators:
+• Regional GDP per capita
+• Regional unemployment rate
+• Sector mix and productivity
+
+Agglomeration effects mean economic activity tends to
+concentrate, so regional policy often tries to spread
+opportunities more evenly.`
 };
 
 /* -----------------------------------------------------
@@ -1267,6 +1592,91 @@ function getPageContext() {
   if (hash.includes("calculator")) return "statistics";
 
   return "general";
+}
+
+const TOPIC_PATTERNS = [
+  { key: "microVsMacro", keys: ["micro vs macro", "microeconomics and macroeconomics", "macroeconomics and microeconomics", "micro and macro"] },
+  { key: "meanVsMedian", keys: ["mean and median", "median and mean", "mean vs median", "mean or median"] },
+  { key: "opportunity", keys: ["opportunity cost", "trade-off", "trade off"] },
+  { key: "scarcity", keys: ["scarcity", "scarce", "economic choice"] },
+  { key: "elasticity", keys: ["elasticity", "elastic", "inelastic", "ped", "price responsive"] },
+  { key: "supply", keys: ["supply and demand", "demand and supply", "supply", "demand", "equilibrium", "market price"] },
+  { key: "taxIncidence", keys: ["deadweight loss", "deadweight", "tax incidence", "tax wedge", "per-unit tax", "consumer surplus", "producer surplus", "surplus"] },
+  { key: "gdp", keys: ["gross domestic product", "gdp", "national income"] },
+  { key: "inflation", keys: ["inflation", "consumer price index", "cpi", "price level", "deflation"] },
+  { key: "unemployment", keys: ["unemployment", "unemployed", "labour force", "labor force", "jobless"] },
+  { key: "micro", keys: ["microeconomics", "micro economics", "micro"], overview: true },
+  { key: "meso", keys: ["mesoeconomics", "meso economics", "meso"], overview: true },
+  { key: "macro", keys: ["macroeconomics", "macro economics", "macro"], overview: true },
+  { key: "mean", keys: ["arithmetic mean", "average", "mean"] },
+  { key: "median", keys: ["median"] },
+  { key: "mode", keys: ["mode", "most frequent"] },
+  { key: "dispersion", keys: ["standard deviation", "variance", "dispersion", "spread"] },
+  { key: "statistics", keys: ["quartile", "percentile", "decile", "quintile", "descriptive statistics", "statistics"] },
+  { key: "hhi", keys: ["herfindahl", "hhi", "market concentration", "concentration"] },
+  { key: "monopoly", keys: ["monopoly", "oligopoly", "perfect competition", "monopolistic competition", "market structure", "market structures"] },
+  { key: "production", keys: ["production cost", "production costs", "marginal cost", "fixed cost", "variable cost", "average cost", "total cost"] },
+  { key: "clusters", keys: ["industrial cluster", "cluster"] },
+  { key: "valuechain", keys: ["value chain", "value added"] },
+  { key: "supplychain", keys: ["supply chain", "industrial organization", "industrial organisation", "logistics"] },
+  { key: "productivity", keys: ["productivity", "sectoral productivity", "sector productivity", "labour productivity", "labor productivity", "output per worker"] },
+  { key: "regional", keys: ["regional development", "regional economic development", "regional economy", "regional", "territorial"] },
+  { key: "monetary", keys: ["monetary policy", "central bank", "interest rate", "money supply"] },
+  { key: "fiscal", keys: ["fiscal policy", "government spending", "taxation", "budget deficit", "public debt"] },
+  { key: "growth", keys: ["economic growth", "real gdp growth", "growth rate", "growth"] },
+  { key: "trade", keys: ["international trade", "exports", "imports", "net exports", "trade balance", "comparative advantage"] },
+  { key: "utility", keys: ["utility", "consumer preferences", "preferences", "consumer choice", "budget constraint"] },
+  { key: "marginal", keys: ["marginal analysis", "marginal benefit", "marginal"] },
+  { key: "freeRider", keys: ["free rider", "free-rider", "public good", "public goods"] }
+];
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+// Pre-compile word-boundary regexes (allowing simple plurals) so that,
+// for example, "ped" does not match "speed" and "mean" does not match "meaning".
+const TOPIC_MATCHERS = TOPIC_PATTERNS.map(pattern => ({
+  ...pattern,
+  regexes: pattern.keys.map(keyword => ({
+    keyword,
+    regex: new RegExp(`\\b${escapeRegExp(keyword)}(?:s|es)?\\b`, "i")
+  }))
+}));
+
+const DOMAIN_TOPICS = {
+  micro: ["opportunity", "scarcity", "elasticity", "supply", "taxIncidence", "utility", "production", "monopoly", "marginal", "micro"],
+  meso: ["clusters", "valuechain", "supplychain", "productivity", "regional", "hhi", "meso"],
+  macro: ["gdp", "inflation", "unemployment", "growth", "monetary", "fiscal", "trade", "macro"],
+  statistics: ["mean", "median", "mode", "dispersion", "statistics", "meanVsMedian"]
+};
+
+function matchTopic(question, domain = "general") {
+  let best = null;
+  let bestScore = 0;
+
+  TOPIC_MATCHERS.forEach(pattern => {
+    // Score by the longest matching keyword: longer phrases are more specific.
+    let score = 0;
+    pattern.regexes.forEach(({ keyword, regex }) => {
+      if (regex.test(question)) score = Math.max(score, keyword.length);
+    });
+
+    if (score === 0) return;
+
+    // Broad overviews lose to any specific concept mentioned alongside them.
+    if (pattern.overview) score *= 0.4;
+
+    // Small nudge towards the learning domain the user selected.
+    if (DOMAIN_TOPICS[domain]?.includes(pattern.key)) score += 1.5;
+
+    if (score > bestScore) {
+      bestScore = score;
+      best = pattern.key;
+    }
+  });
+
+  return best;
 }
 
 function answerEcoBot(question) {
@@ -1307,40 +1717,10 @@ function answerEcoBot(question) {
     return "I'm ÉcoBot, the economics learning assistant of ÉcoLab. I can introduce foundational concepts, explain formulas, walk through selected calculations and help you connect economic ideas to real-world situations. Choose a learning domain above to focus our conversation.";
   }
 
-  // Explicit concept matching
-  const patterns = [
-    { keys: ["opportunity cost", "trade-off", "trade off"], key: "opportunity" },
-    { keys: ["scarcity", "economic choice"], key: "scarcity" },
-    { keys: ["elasticity", "ped", "price responsive"], key: "elasticity" },
-    { keys: ["supply", "demand", "equilibrium"], key: "supply" },
-    { keys: ["gross domestic product", "gdp"], key: "gdp" },
-    { keys: ["inflation", "consumer price index", "cpi"], key: "inflation" },
-    { keys: ["unemployment", "labour force", "labor force"], key: "unemployment" },
-    { keys: ["mesoeconomics", "meso economics", "industrial cluster", "value chain"], key: "meso" },
-    { keys: ["macroeconomics", "macro economics"], key: "macro" },
-    { keys: ["microeconomics", "micro economics"], key: "micro" },
-    { keys: ["arithmetic mean", "average", "mean"], key: "mean" },
-    { keys: ["median"], key: "median" },
-    { keys: ["quartile", "percentile", "decile", "quintile", "descriptive statistics"], key: "statistics" },
-    { keys: ["herfindahl", "hhi", "market concentration"], key: "hhi" },
-    { keys: ["monopoly", "oligopoly", "perfect competition", "monopolistic competition"], key: "monopoly" },
-    { keys: ["production", "marginal cost", "fixed cost", "variable cost"], key: "production" },
-    { keys: ["industrial cluster", "cluster"], key: "clusters" },
-    { keys: ["value chain", "value chains"], key: "valuechain" },
-    { keys: ["monetary policy", "central bank", "interest rate"], key: "monetary" },
-    { keys: ["fiscal policy", "government spending", "taxation"], key: "fiscal" },
-    { keys: ["economic growth", "real gdp growth"], key: "growth" },
-    { keys: ["international trade", "exports", "imports", "net exports"], key: "trade" },
-    { keys: ["utility", "consumer preferences", "consumer choice"], key: "utility" },
-    { keys: ["marginal analysis", "marginal benefit"], key: "marginal" },
-    { keys: ["free rider", "free-rider", "public good"], key: "freeRider" }
-  ];
-
-  for (const pattern of patterns) {
-    if (pattern.keys.some(keyword => q.includes(keyword))) {
-      return ecoKnowledge[pattern.key];
-    }
-  }
+  // Concept matching: score each topic by how specifically it matches,
+  // so "value chains in mesoeconomics" picks value chains, not the overview.
+  const topic = matchTopic(q, domain);
+  if (topic) return ecoKnowledge[topic];
 
   // Domain-specific fallback
   if (domain === "micro") {

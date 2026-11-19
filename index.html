@@ -8,6 +8,8 @@
   <meta name="theme-color" content="#101b16">
   <title>ÉcoLab — Understand the Economy</title>
 
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23101b16'/%3E%3Ctext x='32' y='45' font-family='Arial,sans-serif' font-size='38' font-weight='700' text-anchor='middle' fill='%23b9f36b'%3E%C3%89%3C/text%3E%3C/svg%3E">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -258,6 +260,13 @@
               <div><span>SELLER PRICE</span><strong id="sellerPrice">50.0</strong></div>
               <div><span>QUANTITY</span><strong id="equilibriumQuantity">50.0</strong></div>
             </div>
+            <div class="welfare-results" aria-live="polite">
+              <div><span><i class="swatch swatch-consumer"></i>CONSUMER SURPLUS</span><strong id="consumerSurplus">0</strong></div>
+              <div><span><i class="swatch swatch-producer"></i>PRODUCER SURPLUS</span><strong id="producerSurplus">0</strong></div>
+              <div><span><i class="swatch swatch-revenue"></i>TAX REVENUE</span><strong id="taxRevenue">0</strong></div>
+              <div><span><i class="swatch swatch-deadweight"></i>DEADWEIGHT LOSS</span><strong id="deadweightLoss">0</strong></div>
+            </div>
+
             <p class="chart-footnote">Illustrative linear market model. Prices and quantities are expressed in model units.</p>
           </div>
         </div>
@@ -322,6 +331,42 @@
           <div class="formula-note">GDP = C + I + G + (X − M)</div>
         </article>
 
+        <!-- INFLATION -->
+        <article class="calculator-card">
+          <div class="calculator-card-header">
+            <span class="calc-icon">π</span>
+            <span class="calc-category">MACROECONOMICS</span>
+          </div>
+          <h3>Inflation &amp; purchasing power</h3>
+          <p>Compute the inflation rate between two price index values and see what money is really worth.</p>
+          <div class="calc-inputs two-columns">
+            <label>Previous CPI<input id="cpiOld" type="number" value="100" step="any"></label>
+            <label>Current CPI<input id="cpiNew" type="number" value="105" step="any"></label>
+            <label>Amount of money (optional)<input id="nominalValue" type="number" value="1000" step="any"></label>
+          </div>
+          <button class="button button-dark calc-button" id="calculateInflation">Calculate inflation <span>→</span></button>
+          <div class="calc-result" id="inflationResult" aria-live="polite">Your result will appear here.</div>
+          <div class="formula-note">π = (CPI₁ − CPI₀) / CPI₀ × 100</div>
+        </article>
+
+        <!-- UNEMPLOYMENT -->
+        <article class="calculator-card">
+          <div class="calculator-card-header">
+            <span class="calc-icon">u</span>
+            <span class="calc-category">LABOUR MARKET</span>
+          </div>
+          <h3>Unemployment &amp; participation</h3>
+          <p>Measure the unemployment rate and, with the working-age population, labour force participation.</p>
+          <div class="calc-inputs two-columns">
+            <label>Employed<input id="employed" type="number" value="9200" step="any"></label>
+            <label>Unemployed<input id="unemployed" type="number" value="800" step="any"></label>
+            <label>Working-age population (optional)<input id="workingAgePop" type="number" value="16000" step="any"></label>
+          </div>
+          <button class="button button-dark calc-button" id="calculateUnemployment">Calculate rates <span>→</span></button>
+          <div class="calc-result" id="unemploymentResult" aria-live="polite">Your result will appear here.</div>
+          <div class="formula-note">u = Unemployed / (Employed + Unemployed) × 100</div>
+        </article>
+
         <!-- HHI -->
         <article class="calculator-card">
           <div class="calculator-card-header">
@@ -353,7 +398,7 @@
 
           <button class="button button-dark calc-button" id="calculateStats">Analyze dataset <span>→</span></button>
           <div class="calc-result stats-result" id="statsResult" aria-live="polite">Your results will appear here.</div>
-          <div class="formula-note">Mean · Median · Mode · Range · Q1 · Q3</div>
+          <div class="formula-note">Mean · Median · Mode · Quartiles · Variance · σ</div>
         </article>
       </div>
     </section>

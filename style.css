@@ -817,6 +817,47 @@ h2 span, h1 span {
   color: var(--green);
 }
 
+.welfare-results {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed #3b4d40;
+}
+
+.welfare-results div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.welfare-results span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: 8px var(--mono);
+  color: #91a294;
+  letter-spacing: .6px;
+}
+
+.welfare-results strong {
+  font: 16px var(--display);
+  color: #e6efe0;
+}
+
+.swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.swatch-consumer { background: rgba(185, 243, 107, .55); }
+.swatch-producer { background: rgba(145, 171, 200, .65); }
+.swatch-revenue { background: rgba(231, 183, 123, .7); }
+.swatch-deadweight { background: rgba(240, 120, 100, .8); }
+
 .chart-footnote {
   margin-top: 15px;
   font-size: 9px;
@@ -1720,6 +1761,11 @@ h2 span, h1 span {
 
   .equilibrium-results span {
     font-size: 7px;
+  }
+
+  .welfare-results {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 14px;
   }
 
   .observatory-header {
